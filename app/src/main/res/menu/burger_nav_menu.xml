@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/preferences">
+        <menu>
+            <item
+                android:id="@+id/burger_settings"
+                android:icon="@drawable/ic_baseline_settings_24"
+                android:title="@string/settings" />
+            <item
+                android:id="@+id/burger_options"
+                android:icon="@drawable/ic_baseline_options"
+                android:title="@string/options" />
+        </menu>
+    </item>
+    <item android:title="@string/log_out">
+        <menu>
+            <item
+                android:id="@+id/burger_logout"
+                android:icon="@drawable/ic_baseline_logout"
+                android:title="@string/log_out" />
+        </menu>
+    </item>
+
+</menu>
