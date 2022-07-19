@@ -1,11 +1,16 @@
 package ca.sfu.BlueRadar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -35,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
-
+        checkPermissions()
     }
 
     private fun setupBurgerMenuNavigation(){
@@ -78,5 +83,22 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    fun checkPermissions() {
+        if (Build.VERSION.SDK_INT < 29) return
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT),
+                0
+            )
+        }
     }
 }
