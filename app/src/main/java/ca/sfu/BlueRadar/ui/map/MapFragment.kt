@@ -42,7 +42,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
+        // Initial the Map Setting button
+        mapSettingsBtn = binding.mapSettings
+        mapSettingsBtn.setOnClickListener {
+            val mapDialog = MapDialogFragment()
+            mapDialog.show(childFragmentManager, "Map Setting Dialog")
+        }
 
         return root
     }
