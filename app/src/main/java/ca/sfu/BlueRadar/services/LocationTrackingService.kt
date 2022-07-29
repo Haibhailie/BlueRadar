@@ -95,7 +95,7 @@ class LocationTrackingService: LifecycleService() {
             result.locations.let { locations ->
                 for (location in locations) {
                     updateCurrentPoint(location)
-                    println("debug: New Location ${location.latitude}, ${location.longitude}")
+                    //println("debug: New Location ${location.latitude}, ${location.longitude}")
                 }
             }
         }
