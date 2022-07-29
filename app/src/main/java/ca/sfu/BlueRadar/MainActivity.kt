@@ -1,6 +1,7 @@
 package ca.sfu.BlueRadar
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.LocationTrackingService
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: BottomNavigationView
     lateinit var navController:NavController
     lateinit var appBarConfiguration:AppBarConfiguration
+    private lateinit var locationTrackingServiceIntent: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
         checkPermissions()
+        startLocationTrackingService()
     }
 
     private fun setupBurgerMenuNavigation(){
@@ -103,5 +107,18 @@ class MainActivity : AppCompatActivity() {
                 0
             )
         }
+    }
+
+    private fun startLocationTrackingService() {
+        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
+        this.startService(locationTrackingServiceIntent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val intent = Intent()
+        intent.action = LocationTrackingService.STOP_TRACKING_SERVICE
+        sendBroadcast(intent)
+        LocationTrackingService.isTracking.value = false
     }
 }

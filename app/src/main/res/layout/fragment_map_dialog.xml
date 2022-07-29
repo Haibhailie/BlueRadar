@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".ui.map.MapDialogFragment">
+
+    <RadioGroup
+        android:id="@+id/settingRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="?android:attr/dividerHorizontal"
+        android:showDividers="middle"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <RadioButton
+            android:id="@+id/showAllRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/option_show_all"
+            android:textSize="16dp"/>
+
+        <RadioButton
+            android:id="@+id/showLastRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/option_show_last_location"
+            android:textSize="16dp" />
+
+        <RadioButton
+            android:id="@+id/showPresentRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/option_show_present_location"
+            android:textSize="16dp"/>
+
+        <RadioButton
+            android:id="@+id/showDisconnectedRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/option_show_disconnected"
+            android:textSize="16dp"/>
+
+        <RadioButton
+            android:id="@+id/showConnectedRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/option_show_connected"
+            android:textSize="16dp"/>
+    </RadioGroup>
+
+</LinearLayout>
