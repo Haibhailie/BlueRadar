@@ -2,7 +2,7 @@
     <string name="app_name">BlueRadar</string>
     <string name="title_devices">Devices</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_map">Map</string>
     <string name="default_username">Pikachu</string>
     <string name="default_email">pikachu@pokemon.com</string>
     <string name="settings">Settings</string>
