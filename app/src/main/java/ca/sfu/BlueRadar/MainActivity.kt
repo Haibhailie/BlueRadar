@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         val intent = Intent()
-        intent.action = LocationTrackingService.STOP_NOTIFY_SERVICE
+        intent.action = LocationTrackingService.STOP_TRACKING_SERVICE
         sendBroadcast(intent)
         LocationTrackingService.isTracking.value = false
     }
