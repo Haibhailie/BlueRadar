@@ -32,6 +32,7 @@ interface DeviceDatabaseDao {
     fun deleteEntry(key: Long)
 
     @Update(entity = Device::class)
-    fun update(device: Device)
+    fun update(device:Device)
+
 //    @Update
 }

@@ -18,14 +18,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import ca.sfu.BlueRadar.services.LocationTrackingService
-import com.google.android.gms.maps.model.LatLng
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
+import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
+import com.google.android.gms.maps.model.LatLng
+
 
 class DevicesFragment : Fragment() {
     private var _binding: FragmentDevicesBinding? = null
@@ -35,19 +36,19 @@ class DevicesFragment : Fragment() {
     private var bluetoothDevices: ArrayList<String> = ArrayList()
     private var deviceAddresses: ArrayList<String> = ArrayList()
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-
     private val binding get() = _binding!!
     private lateinit var database: DeviceDatabase
     private lateinit var databaseDao: DeviceDatabaseDao
     private lateinit var viewModelFactory: DeviceViewModelFactory
     private lateinit var deviceViewModel: DeviceViewModel
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var arrayList: ArrayList<Device>
+    private lateinit var recyclerAdapter: DeviceRecyclerAdapter
 
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            when(intent.action) {
+            when (intent.action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
 
                     val device: BluetoothDevice? = intent.getParcelableExtra(
@@ -58,7 +59,10 @@ class DevicesFragment : Fragment() {
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
+
                                 i.deviceConnected = true
+                                deviceViewModel.updateConnected(i)
+                                println("CONNECTED DEVICE IS: ${i}")
                                 updateRecyclerView()
                             }
                         }
@@ -83,9 +87,15 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
+                                deviceViewModel.updateConnected(i)
+                                println("CONNECTED DEVICE IS: ${i}")
                                 updateRecyclerView()
-                                val toast: Toast = Toast.makeText(requireContext(), "Last Loc: ${lastLoc.latitude}, ${lastLoc.longitude}", Toast
-                                    .LENGTH_SHORT)
+                                val toast: Toast = Toast.makeText(
+                                    requireContext(),
+                                    "Last Loc: ${lastLoc.latitude}, ${lastLoc.longitude}",
+                                    Toast
+                                        .LENGTH_SHORT
+                                )
                                 toast.show()
                             }
                         }
@@ -147,6 +157,12 @@ class DevicesFragment : Fragment() {
         }
 
         requireActivity().registerReceiver(receiver, filter)
+
+        firstBootSetup()
+
+    }
+
+    private fun firstBootSetup() {
         database = DeviceDatabase.getInstance(requireActivity())
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
@@ -162,10 +178,18 @@ class DevicesFragment : Fragment() {
             btDevice.deviceName = deviceName
             btDevice.deviceType = device.type.toString()
             btDevice.deviceTracking = true
-            if (deviceViewModel.allEntriesLiveData.value?.contains(btDevice) == false) {
+
+            var liveList = deviceViewModel.allEntriesLiveData.value
+            var isDuplicate = false
+            if (liveList != null) {
+                for(check in liveList){
+                    if(check.deviceName == btDevice.deviceName)
+                        isDuplicate = true
+                }
+            }
+            if (!isDuplicate) {
                 deviceViewModel.insert(btDevice)
             }
-
             val deviceHardwareAddress = device.address // MAC Address
             Log.d("bonded-device-name", btDevice.deviceName)
             Log.d("bonded-device-address", deviceHardwareAddress)
@@ -179,24 +203,65 @@ class DevicesFragment : Fragment() {
             toast.show()
         }
         bluetoothAdapter.startDiscovery()
-
     }
 
-    private fun updateRecyclerView() {
-        val recyclerView = binding.devicesRecycler
+    override fun onPause() {
+        super.onPause()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        removeDuplicates(arrayList)
+        updateRecyclerView()
+    }
+
+    fun <T> removeDuplicates(list: ArrayList<T>): ArrayList<T>? {
+        // Create a new ArrayList
+        val newList = ArrayList<T>()
+
+        // Traverse through the first list
+        for (element in list) {
+
+            // If this element is not present in newList
+            // then add it
+            if (!newList.contains(element)) {
+                newList.add(element)
+            }
+        }
+        // return the new list
+        return newList
+    }
+
+    private fun setupRecyclerView() {
+        recyclerView = binding.devicesRecycler
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
-        val arrayList: ArrayList<Device> = ArrayList()
-        val recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList)
-        recyclerView.addItemDecoration(
-            MarginItemDecoration(25)
-        )
+        arrayList = ArrayList()
+        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList)
+        recyclerView.adapter = recyclerAdapter
+        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
+        arrayList = ArrayList()
+        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList)
+        removeDuplicates(arrayList)
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             recyclerAdapter.replace(it)
             recyclerAdapter.notifyDataSetChanged()
         }
         recyclerView.adapter = recyclerAdapter
+
+        recyclerView.addItemDecoration(
+            MarginItemDecoration(25)
+        )
     }
+
+    private fun updateRecyclerView  () {
+
+        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+            recyclerAdapter.replace(it)
+            recyclerAdapter.notifyDataSetChanged()
+        }
+
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -205,14 +270,14 @@ class DevicesFragment : Fragment() {
 
         _binding = FragmentDevicesBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        updateRecyclerView()
+        setupRecyclerView()
         return root
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-        deviceViewModel.deleteAll()
+        //deviceViewModel.deleteAll()
         requireActivity().unregisterReceiver(receiver)
     }
 
