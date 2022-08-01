@@ -8,28 +8,24 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
-import android.bluetooth.*
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.BlueRadar.services.LocationTrackingService
+import com.google.android.gms.maps.model.LatLng
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
-import ca.sfu.BlueRadar.databinding.FragmentHomeBinding
-import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
-import com.google.android.gms.maps.model.LatLng
 
 class DevicesFragment : Fragment() {
     private var _binding: FragmentDevicesBinding? = null
@@ -51,7 +47,50 @@ class DevicesFragment : Fragment() {
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
+            when(intent.action) {
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                    val device: BluetoothDevice? = intent.getParcelableExtra(
+                        BluetoothDevice
+                            .EXTRA_DEVICE
+                    )
+                    val temp = deviceViewModel.allEntriesLiveData.value
+                    if (temp?.isNotEmpty() == true && device != null) {
+                        for (i in temp) {
+                            if (i.deviceName == device.name) {
+                                i.deviceConnected = true
+                                Log.d("check me again bitch", "haha")
+                            }
+                        }
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    val g: ArrayList<LatLng?> = ArrayList()
+                    g.add(LocationTrackingService.currentPoint.value)
+                    val device: BluetoothDevice? = intent.getParcelableExtra(
+                        BluetoothDevice
+                            .EXTRA_DEVICE
+                    )
+                    val dbList = deviceViewModel.allEntriesLiveData.value
+                    var lastLoc = LatLng(0.0, 0.0)
+                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
+                        lastLoc = it
+                    }
+                    if (dbList?.isNotEmpty() == true && device != null) {
+                        for (i in dbList) {
+                            if (i.deviceName == device.name) {
+                                i.deviceConnected = false
+                                i.deviceLastLocation = lastLoc
+                                Log.d("check me again bitch", i.deviceLastLocation.toString())
+                            }
+                        }
+                    }
+                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
+                        Log.d("check me again bitch", i.toString())
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
+
+                }
                 BluetoothDevice.ACTION_FOUND -> {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
@@ -158,7 +197,6 @@ class DevicesFragment : Fragment() {
             recyclerAdapter.replace(it)
             recyclerAdapter.notifyDataSetChanged()
         }
-
         recyclerView.adapter = recyclerAdapter
         return root
     }
