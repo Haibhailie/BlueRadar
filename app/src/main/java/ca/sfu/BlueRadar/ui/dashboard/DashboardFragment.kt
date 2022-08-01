@@ -1,6 +1,7 @@
 package ca.sfu.BlueRadar.ui.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,16 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 
 class DashboardFragment : Fragment() {
+    private lateinit var database: DeviceDatabase
+    private lateinit var databaseDao: DeviceDatabaseDao
+    private lateinit var viewModelFactory: DeviceViewModelFactory
+    private lateinit var deviceViewModel: DeviceViewModel
 
     private var _binding: FragmentDashboardBinding? = null
 
@@ -32,6 +41,16 @@ class DashboardFragment : Fragment() {
         dashboardViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+        database = DeviceDatabase.getInstance(requireActivity())
+        databaseDao = database.deviceDatabaseDao
+        viewModelFactory = DeviceViewModelFactory(databaseDao)
+        deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
+        if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
+            for(i in deviceViewModel.allEntriesLiveData.value!!) {
+                Log.d("check_from_dash", i.toString())
+            }
+        }
+
         return root
     }
 

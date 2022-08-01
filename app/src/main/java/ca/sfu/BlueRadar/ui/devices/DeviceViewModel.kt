@@ -16,16 +16,18 @@ import java.lang.IllegalArgumentException
  * Exercise Entry view model connects application the database with DAO
  *
  */
-class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao): ViewModel() {
+class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewModel() {
     val allEntriesLiveData: LiveData<List<Device>> = deviceDatabaseDao.getAllEntries()
         .asLiveData()
+
     fun insert(entry: Device) {
         CoroutineScope(Dispatchers.IO).launch {
             deviceDatabaseDao.insertEntry(entry)
         }
     }
+
     fun delete(id: Long) {
-        if(allEntriesLiveData.value!!.isNotEmpty()) {
+        if (allEntriesLiveData.value!!.isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 deviceDatabaseDao.deleteEntry(id)
             }
@@ -37,12 +39,20 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao): ViewMod
             deviceDatabaseDao.deleteAll()
         }
     }
+
+    fun updateConnected(device: Device) {
+        CoroutineScope(Dispatchers.IO).launch {
+            deviceDatabaseDao.update(device)
+        }
+        println("CONNECTED UPDATE VIEW MODEL CALLED")
+    }
+
 }
 
-class DeviceViewModelFactory (private val repository: DeviceDatabaseDao) :
-        ViewModelProvider.Factory {
-    override fun<T: ViewModel> create(modelClass: Class<T>) : T{ //create() creates a new instance of the modelClass, which is CommentViewModel in this case.
-        if(modelClass.isAssignableFrom(DeviceViewModel::class.java))
+class DeviceViewModelFactory(private val repository: DeviceDatabaseDao) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T { //create() creates a new instance of the modelClass, which is CommentViewModel in this case.
+        if (modelClass.isAssignableFrom(DeviceViewModel::class.java))
             return DeviceViewModel(repository) as T
         throw IllegalArgumentException("Unknown ViewModel class")
     }
