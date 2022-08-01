@@ -38,14 +38,15 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
             holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
         }
         //Uncomment when deviceConnected is implemented
-//        if(currItem.deviceConnected){
-//            holder.deviceStatusTextView.text = "Connected"
-//            holder.deviceStatusTextView.setTextColor(Color.GREEN)
-//        }
-//        else{
-//            holder.deviceStatusTextView.text = "Not Connected"
-//            holder.deviceStatusTextView.setTextColor(Color.RED)
-//        }
+
+        if(currItem.deviceConnected){
+            holder.deviceStatusTextView.text = "Connected"
+            holder.deviceStatusTextView.setTextColor(Color.GREEN)
+        }
+        else{
+            holder.deviceStatusTextView.text = "Not Connected"
+            holder.deviceStatusTextView.setTextColor(Color.RED)
+        }
 
 
         holder.trackingSwitch.setOnCheckedChangeListener { buttonView, isChecked ->

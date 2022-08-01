@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
-import ca.sfu.BlueRadar.databinding.FragmentHomeBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
