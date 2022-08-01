@@ -158,9 +158,7 @@ class DevicesFragment : Fragment() {
         }
 
         requireActivity().registerReceiver(receiver, filter)
-
         firstBootSetup()
-
     }
 
     private fun firstBootSetup() {
@@ -182,15 +180,18 @@ class DevicesFragment : Fragment() {
 
             var liveList = deviceViewModel.allEntriesLiveData.value
             var isDuplicate = false
+
             if (liveList != null) {
                 for(check in liveList){
                     if(check.deviceName == btDevice.deviceName)
                         isDuplicate = true
                 }
             }
+
             if (!isDuplicate) {
                 deviceViewModel.insert(btDevice)
             }
+
             val deviceHardwareAddress = device.address // MAC Address
             Log.d("bonded-device-name", btDevice.deviceName)
             Log.d("bonded-device-address", deviceHardwareAddress)
