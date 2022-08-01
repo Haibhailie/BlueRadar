@@ -49,6 +49,7 @@ class DevicesFragment : Fragment() {
         override fun onReceive(context: Context, intent: Intent) {
             when(intent.action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
+
                     val device: BluetoothDevice? = intent.getParcelableExtra(
                         BluetoothDevice
                             .EXTRA_DEVICE
@@ -58,10 +59,11 @@ class DevicesFragment : Fragment() {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = true
-                                Log.d("check me again bitch", "haha")
+                                updateRecyclerView()
                             }
                         }
                     }
+
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
@@ -81,12 +83,15 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
-                                Log.d("check me again bitch", i.deviceLastLocation.toString())
+                                updateRecyclerView()
+                                val toast: Toast = Toast.makeText(requireContext(), "Last Loc: ${lastLoc.latitude}, ${lastLoc.longitude}", Toast
+                                    .LENGTH_SHORT)
+                                toast.show()
                             }
                         }
                     }
                     for (i in deviceViewModel.allEntriesLiveData.value!!) {
-                        Log.d("check me again bitch", i.toString())
+                        Log.d("check me", i.toString())
                     }
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
 
@@ -177,14 +182,7 @@ class DevicesFragment : Fragment() {
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        _binding = FragmentDevicesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    private fun updateRecyclerView() {
         val recyclerView = binding.devicesRecycler
 
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
@@ -198,6 +196,16 @@ class DevicesFragment : Fragment() {
             recyclerAdapter.notifyDataSetChanged()
         }
         recyclerView.adapter = recyclerAdapter
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        _binding = FragmentDevicesBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+        updateRecyclerView()
         return root
     }
 
