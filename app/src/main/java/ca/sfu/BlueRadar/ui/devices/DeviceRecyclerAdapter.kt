@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.TextView
@@ -47,7 +48,7 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
 //        }
 
 
-        holder.trackingSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+        holder.trackingSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 //Set the tracking to true here and update the database
                 holder.deviceIsTrackingTextView.text = "Tracking"
@@ -57,7 +58,11 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
             }
-        })
+        }
+
+        holder.navButton.setOnClickListener{
+            //Start the location tracking service
+        }
     }
 
     override fun getItemCount(): Int {
@@ -74,10 +79,10 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
         val deviceStatusTextView: TextView = itemView.findViewById(R.id.deviceStatusTextView)
         val deviceIsTrackingTextView: TextView = itemView.findViewById(R.id.deviceTrackingTextView)
         val trackingSwitch: SwitchMaterial = itemView.findViewById(R.id.trackingSwitch)
-        val editButton : ImageButton = itemView.findViewById(R.id.editButton)
-        val navButton : ImageButton = itemView.findViewById(R.id.navigateButton)
-        val syncButton : ImageButton = itemView.findViewById(R.id.syncButton)
-        val delButton : ImageButton = itemView.findViewById(R.id.deleteButton)
+        val editButton: ImageButton = itemView.findViewById(R.id.editButton)
+        val navButton: ImageButton = itemView.findViewById(R.id.navigateButton)
+        val syncButton: ImageButton = itemView.findViewById(R.id.syncButton)
+        val delButton: ImageButton = itemView.findViewById(R.id.deleteButton)
     }
 
 }
