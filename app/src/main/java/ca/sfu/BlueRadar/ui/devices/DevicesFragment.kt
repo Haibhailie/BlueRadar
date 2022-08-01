@@ -1,26 +1,27 @@
 package ca.sfu.BlueRadar.ui.devices
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.content.*
+import android.bluetooth.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.databinding.FragmentHomeBinding
+import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
-import kotlin.collections.ArrayList
+import com.google.android.gms.maps.model.LatLng
 
 class DevicesFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -29,8 +30,7 @@ class DevicesFragment : Fragment() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothDevices: ArrayList<String> = ArrayList()
     private var deviceAddresses: ArrayList<String> = ArrayList()
-//    private var adapter = ArrayAdapter(requireActivity(),android.R.layout.simple_list_item_1,
-//        bluetoothDevices)
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -43,6 +43,45 @@ class DevicesFragment : Fragment() {
 
         override fun onReceive(context: Context, intent: Intent) {
             when(intent.action) {
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice
+                        .EXTRA_DEVICE)
+                    val temp = deviceViewModel.allEntriesLiveData.value
+                    if (temp?.isNotEmpty() == true && device != null) {
+                        for(i in temp) {
+                            if(i.deviceName == device.name) {
+                                i.deviceConnected = true
+                                Log.d("check me again bitch", "haha")
+                            }
+                        }
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    val g:ArrayList<LatLng?> = ArrayList()
+                    g.add(LocationTrackingService.currentPoint.value)
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice
+                        .EXTRA_DEVICE)
+                    val dbList = deviceViewModel.allEntriesLiveData.value
+                    var lastLoc = LatLng(0.0,0.0)
+                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
+                        lastLoc = it
+                    }
+                    if (dbList?.isNotEmpty() == true && device != null) {
+                        for(i in dbList) {
+                            if(i.deviceName == device.name) {
+                                i.deviceConnected = false
+                                i.deviceLastLocation = lastLoc
+                                Log.d("check me again bitch", i.deviceLastLocation.toString())
+                            }
+                        }
+                    }
+                    for(i in deviceViewModel.allEntriesLiveData.value!!) {
+                        Log.d("check me again bitch", i.toString())
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
+
+                }
                 BluetoothDevice.ACTION_FOUND -> {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
@@ -56,16 +95,14 @@ class DevicesFragment : Fragment() {
                         if (deviceHardwareAddress != null) {
                             deviceAddresses.add(deviceHardwareAddress)
                         }
+
                         val deviceString = if(deviceName.isNullOrEmpty()) {
                             "$deviceHardwareAddress RSSI $rssi dBm"
                         } else {
                             "$deviceName RSSI $rssi dBm"
                         }
                         bluetoothDevices.add(deviceString)
-//                        adapter.notifyDataSetChanged()
                     }
-                    Log.d("device-name", deviceName.toString())
-                    Log.d("deviceHardwareAddress", deviceHardwareAddress.toString())
                 }
             }
         }
@@ -86,8 +123,10 @@ class DevicesFragment : Fragment() {
             addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
             addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
             addAction(BluetoothDevice.ACTION_FOUND)
+            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
+            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-
+            addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
         }
 
         requireActivity().registerReceiver(receiver, filter)
@@ -95,6 +134,7 @@ class DevicesFragment : Fragment() {
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
+
 
 
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
@@ -113,7 +153,6 @@ class DevicesFragment : Fragment() {
             Log.d("bonded-device-name", btDevice.deviceName)
             Log.d("bonded-device-address", deviceHardwareAddress)
         }
-
 
         // checking status
         val toast: Toast
@@ -134,35 +173,25 @@ class DevicesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val devicesViewModel =
-//            ViewModelProvider(this).get(DevicesViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
         val listView: ListView = binding.myListView
 
-//        val textView: TextView = binding.textHome
-//        devicesViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//            var i = 0
-//            for(item in deviceNameList) {
-//                textView.text = "Connected Devices: $item"
-//            }
-//        }
         val arrayList: ArrayList<Device> = ArrayList()
         val arrayAdapter = DeviceListAdapter(requireActivity(),arrayList)
         listView.adapter = arrayAdapter
-
-//        var deviceListView: ListView? = view?.findViewById(R.id.myListView)
-//        val arrayAdapter: ArrayAdapter<String> = ArrayAdapter(requireContext(),
-//            android.R.layout.simple_list_item_1, deviceNameList)
-//        if (deviceListView != null) {
-//            deviceListView.adapter = arrayAdapter
-//        }
+        val check = bluetoothAdapter.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
+                BluetoothHeadset
+            .STATE_CONNECTED
+        Log.d("checking connection", check.toString())
+        val li = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+        Log.d("Connected Devices: ", li.size.toString())
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             arrayAdapter.replace(it)
             arrayAdapter.notifyDataSetChanged()
         }
+
         return root
     }
 
