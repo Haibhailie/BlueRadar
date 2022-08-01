@@ -3,6 +3,7 @@ package ca.sfu.BlueRadar.ui.devices.data
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -29,4 +30,8 @@ interface DeviceDatabaseDao {
 
     @Query("DELETE FROM device_table WHERE id = :key") //":" indicates that it is a Bind variable
     fun deleteEntry(key: Long)
+
+    @Update(entity = Device::class)
+    fun update(device: Device)
+//    @Update
 }
