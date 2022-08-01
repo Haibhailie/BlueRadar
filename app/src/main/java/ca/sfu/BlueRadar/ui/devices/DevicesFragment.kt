@@ -83,6 +83,7 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
+                                updateRecyclerView()
                                 val toast: Toast = Toast.makeText(requireContext(), "Last Loc: ${lastLoc.latitude}, ${lastLoc.longitude}", Toast
                                     .LENGTH_SHORT)
                                 toast.show()
