@@ -26,6 +26,7 @@ import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
+import ca.sfu.BlueRadar.Util.Util.removeDuplicates
 
 
 class DevicesFragment : Fragment() {
@@ -215,22 +216,6 @@ class DevicesFragment : Fragment() {
         updateRecyclerView()
     }
 
-    fun <T> removeDuplicates(list: ArrayList<T>): ArrayList<T>? {
-        // Create a new ArrayList
-        val newList = ArrayList<T>()
-
-        // Traverse through the first list
-        for (element in list) {
-
-            // If this element is not present in newList
-            // then add it
-            if (!newList.contains(element)) {
-                newList.add(element)
-            }
-        }
-        // return the new list
-        return newList
-    }
 
     private fun setupRecyclerView() {
         recyclerView = binding.devicesRecycler
