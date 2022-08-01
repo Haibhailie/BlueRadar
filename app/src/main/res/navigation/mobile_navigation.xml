@@ -14,7 +14,7 @@
         android:id="@+id/navigation_devices"
         android:name="ca.sfu.BlueRadar.ui.devices.DevicesFragment"
         android:label="@string/title_devices"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_devices" />
     <fragment
         android:id="@+id/navigation_map"
         android:name="ca.sfu.BlueRadar.ui.map.MapFragment"
