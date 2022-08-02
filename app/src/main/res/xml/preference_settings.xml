@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:title="Application Preferences"
+        android:title="User Preferences"
         app:iconSpaceReserved="false">
 
         <Preference
@@ -27,7 +27,7 @@
         android:title="Additional Settings"
         app:iconSpaceReserved="false">
 
-        <ListPreference
+        <Preference
             android:key="preference_notifications"
             android:title="Notification Settings"
             android:summary="Adjust notifications to be enabled or disabled"

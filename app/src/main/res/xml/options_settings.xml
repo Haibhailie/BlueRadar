@@ -8,16 +8,19 @@
         android:title="Application Preferences"
         app:iconSpaceReserved="false">
 
-        <Preference
+        <ListPreference
             android:key="options_colours"
             android:title="Application Colour Theme"
             android:summary="Change the outline colours!"
+            android:entryValues="@array/options_values"
+            app:entries="@array/options_colours"
             app:iconSpaceReserved="false">
-        </Preference>
+        </ListPreference>
         <SwitchPreference
             android:key="options_map_dark_mode"
             android:title="Map Dark Mode"
             android:summary="Tap to switch on or off"
+            android:defaultValue="false"
             app:iconSpaceReserved="false">
         </SwitchPreference>
 
