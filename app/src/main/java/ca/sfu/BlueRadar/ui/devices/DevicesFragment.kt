@@ -177,6 +177,7 @@ class DevicesFragment : Fragment() {
             btDevice.deviceName = deviceName
             btDevice.deviceType = device.type.toString()
             btDevice.deviceTracking = true
+            btDevice.deviceMacAddress = device.address
 
             var liveList = deviceViewModel.allEntriesLiveData.value
             var isDuplicate = false
