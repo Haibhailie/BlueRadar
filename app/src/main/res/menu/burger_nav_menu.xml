@@ -15,6 +15,18 @@
                 android:title="@string/options" />
         </menu>
     </item>
+    <item android:title="@string/about">
+        <menu>
+            <item
+                android:id="@+id/bueger_about_app"
+                android:icon="@drawable/blueradar_logo"
+                android:title="About the Application" />
+            <item
+                android:id="@+id/burger_about_devs"
+                android:icon="@drawable/ic_baseline_about_24"
+                android:title="@string/about_the_developers" />
+        </menu>
+    </item>
     <item android:title="@string/log_out">
         <menu>
             <item

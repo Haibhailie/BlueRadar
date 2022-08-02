@@ -18,6 +18,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import ca.sfu.BlueRadar.about.AboutApplication
+import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import com.google.android.material.navigation.NavigationView
@@ -29,8 +31,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var burgerMenuLayout: DrawerLayout
     lateinit var burgerView: NavigationView
     lateinit var navView: BottomNavigationView
-    lateinit var navController:NavController
-    lateinit var appBarConfiguration:AppBarConfiguration
+    lateinit var navController: NavController
+    lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var locationTrackingServiceIntent: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         startLocationTrackingService()
     }
 
-    private fun setupBurgerMenuNavigation(){
+    private fun setupBurgerMenuNavigation() {
         navView = binding.navView
         navController = findNavController(R.id.nav_host_fragment_activity_main)
         appBarConfiguration = AppBarConfiguration(
@@ -59,9 +61,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    private fun setupBurgerMenuContents(){
-        burgerMenuLayout= findViewById(R.id.burger_layout)
-        burgerView= findViewById(R.id.burger_view)
+    private fun setupBurgerMenuContents() {
+        burgerMenuLayout = findViewById(R.id.burger_layout)
+        burgerView = findViewById(R.id.burger_view)
 
         burgerToggle = ActionBarDrawerToggle(this, burgerMenuLayout, R.string.open, R.string.close)
         burgerMenuLayout.addDrawerListener(burgerToggle)
@@ -77,13 +79,21 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.burger_logout ->
                     Toast.makeText(applicationContext, "Logged Out", Toast.LENGTH_SHORT).show()
+
+                R.id.burger_about_devs -> {
+                    startActivity(Intent(this, AboutDevelopers::class.java))
+                }
+
+                R.id.bueger_about_app -> {
+                    startActivity(Intent(this, AboutApplication::class.java))
+                }
             }
             true
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(burgerToggle.onOptionsItemSelected(item)){
+        if (burgerToggle.onOptionsItemSelected(item)) {
             return true
         }
         return false
@@ -99,11 +109,14 @@ class MainActivity : AppCompatActivity() {
             || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
             != PackageManager.PERMISSION_GRANTED
             || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT,
-                        Manifest.permission.BLUETOOTH_SCAN),
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ),
                 0
             )
         }

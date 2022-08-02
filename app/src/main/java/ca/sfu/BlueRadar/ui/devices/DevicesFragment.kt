@@ -30,6 +30,7 @@ import ca.sfu.BlueRadar.util.Util.removeDuplicates
 
 
 class DevicesFragment : Fragment() {
+
     private var _binding: FragmentDevicesBinding? = null
     private var deviceNameList: ArrayList<String> = ArrayList()
     private lateinit var bluetoothManager: BluetoothManager
