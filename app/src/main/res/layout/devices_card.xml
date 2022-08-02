@@ -84,11 +84,7 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_sync_24" />
 
-                    <ImageButton
-                        android:id="@+id/deleteButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_baseline_delete_24" />
+
                 </LinearLayout>
             </LinearLayout>
 

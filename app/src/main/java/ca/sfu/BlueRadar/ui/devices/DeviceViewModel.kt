@@ -21,10 +21,10 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewMo
         .asLiveData()
 
     val activeEntriesLiveData: LiveData<List<Device>> =
-        deviceDatabaseDao.getAllActiveEntries().asLiveData()
+        deviceDatabaseDao.getAllActiveEntries(true).asLiveData()
 
     val inactiveEntriesLiveData: LiveData<List<Device>> =
-        deviceDatabaseDao.getAllInactiveEntries().asLiveData()
+        deviceDatabaseDao.getAllInactiveEntries(false).asLiveData()
 
     fun insert(entry: Device) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -50,7 +50,6 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewMo
         CoroutineScope(Dispatchers.IO).launch {
             deviceDatabaseDao.update(device)
         }
-        println("CONNECTED UPDATE VIEW MODEL CALLED")
     }
 
 }

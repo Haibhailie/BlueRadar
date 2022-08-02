@@ -22,12 +22,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
-
 
 class DevicesFragment : Fragment() {
     private var _binding: FragmentDevicesBinding? = null
@@ -36,7 +36,7 @@ class DevicesFragment : Fragment() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothDevices: ArrayList<String> = ArrayList()
     private var deviceAddresses: ArrayList<String> = ArrayList()
-    private var viewDevices = 1
+    private var viewDevices = 0
 
     private val binding get() = _binding!!
     private lateinit var database: DeviceDatabase
@@ -132,6 +132,7 @@ class DevicesFragment : Fragment() {
         }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bluetoothManager = getSystemService(requireContext(), BluetoothManager::class.java)!!
@@ -164,7 +165,6 @@ class DevicesFragment : Fragment() {
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel =
             ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
-
 
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
         pairedDevices?.forEach { device ->
@@ -205,10 +205,10 @@ class DevicesFragment : Fragment() {
     }
 
     private fun setupButtonGroupListener() {
-        buttonGroup.selectButton(binding.activeDeviceButton)
+        buttonGroup.selectButton(binding.allDeviceButton)
         buttonGroup.setOnSelectListener {
             viewDevices = when (it) {
-                binding.inactiveDeviceButton -> {
+                binding.allDeviceButton -> {
                     0
                 }
                 binding.activeDeviceButton -> {
@@ -220,10 +220,6 @@ class DevicesFragment : Fragment() {
             }
             updateRecyclerView()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun onResume() {
@@ -239,22 +235,27 @@ class DevicesFragment : Fragment() {
         recyclerAdapter =
             DeviceRecyclerAdapter(
                 requireActivity(), arrayList, deviceViewModel
-            ) { recyclerAdapter.notifyDataSetChanged() }
+            )
 
         when (viewDevices) {
             0 -> {
-                deviceViewModel.inactiveEntriesLiveData.observe(viewLifecycleOwner) {
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
                 }
             }
             1 -> {
-                deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
                 }
             }
             else -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -272,24 +273,30 @@ class DevicesFragment : Fragment() {
 
         when (viewDevices) {
             0 -> {
-                deviceViewModel.inactiveEntriesLiveData.observe(viewLifecycleOwner) {
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
                 }
             }
             1 -> {
-                deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
                 }
             }
             else -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
                 }
             }
         }
+        recyclerView.adapter = recyclerAdapter
     }
 
     override fun onCreateView(

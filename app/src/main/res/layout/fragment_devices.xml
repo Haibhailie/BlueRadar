@@ -20,6 +20,15 @@
             app:justifyContent="center">
 
             <nl.bryanderidder.themedtogglebuttongroup.ThemedButton
+                android:id="@+id/allDeviceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                app:toggle_selectedBackgroundColor="@color/primary"
+                app:toggle_text="All     Devices"
+                android:focusedByDefault="true"
+                app:toggle_textSize="16sp" />
+
+            <nl.bryanderidder.themedtogglebuttongroup.ThemedButton
                 android:id="@+id/activeDeviceButton"
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"

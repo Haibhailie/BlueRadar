@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.navigation.NavigationActivity
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -17,22 +19,23 @@ class DeviceRecyclerAdapter(
     private val context: Context,
     private var deviceList: List<Device>,
     private var deviceViewModel: DeviceViewModel,
-    private val onDataSetChanged: () -> Unit
 ) :
     RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>() {
-    private lateinit var view: View
+
+    private lateinit var notificationIntent: Intent
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        view = View.inflate(context, R.layout.devices_card, null)
+        val view: View = View.inflate(context, R.layout.devices_card, null)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val currItem = deviceList[position]
         //holder.imageView.setImageResource(ItemsViewModel.image)
         holder.deviceNameTextView.text = currItem.deviceName
-
+        notificationIntent = Intent(context, NotificationService::class.java)
         if (currItem.deviceTracking) {
             holder.deviceIsTrackingTextView.text = "Tracking"
             holder.deviceIsTrackingTextView.setTextColor(Color.GREEN)
@@ -41,7 +44,7 @@ class DeviceRecyclerAdapter(
             holder.deviceIsTrackingTextView.text = "Not Tracking"
             holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
         }
-
+        //Uncomment when deviceConnected is implemented
         if (currItem.deviceConnected) {
             holder.deviceStatusTextView.text = "Connected"
             holder.deviceStatusTextView.setTextColor(Color.GREEN)
@@ -52,21 +55,34 @@ class DeviceRecyclerAdapter(
 
         holder.trackingSwitch.isChecked = currItem.deviceTracking
 
-        holder.trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
+        holder.trackingSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 //Set the tracking to true here and update the database
                 holder.deviceIsTrackingTextView.text = "Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GREEN)
                 currItem.deviceTracking = true
                 deviceViewModel.update(currItem)
-                println("TRACKING UPDATED: ${deviceViewModel.allEntriesLiveData.value}")
+
+                context.startService(notificationIntent)
             } else {
                 //Set the tracking to false here and update the database
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
                 currItem.deviceTracking = false
-                deviceViewModel.update(currItem)
 
+                var safeToClose = true
+                for (device in deviceViewModel.allEntriesLiveData.value!!) {
+                    if (device.deviceTracking == true)
+                        safeToClose = false
+                }
+                if (safeToClose) {
+                    val intent = Intent()
+                    intent.action = NotificationService.STOP_SERVICE_ACTION
+                    context.sendBroadcast(intent)
+
+                }
+
+                deviceViewModel.update(currItem)
             }
         }
         holder.navButton.setOnClickListener {
@@ -74,6 +90,14 @@ class DeviceRecyclerAdapter(
             val navigationIntent = Intent(context, NavigationActivity::class.java)
             navigationIntent.putExtra("deviceLocation", currItem.deviceLastLocation)
             context.startActivity(navigationIntent)
+        }
+        holder.syncButton.setOnClickListener{
+            Toast.makeText(context, "Syncing connection of ${currItem.deviceName}", Toast.LENGTH_SHORT).show()
+
+            if (currItem.deviceConnected) {
+                holder.deviceStatusTextView.text = "Connected"
+                holder.deviceStatusTextView.setTextColor(Color.GREEN)
+            }
         }
     }
 
@@ -94,7 +118,6 @@ class DeviceRecyclerAdapter(
         val editButton: ImageButton = itemView.findViewById(R.id.editButton)
         val navButton: ImageButton = itemView.findViewById(R.id.navigateButton)
         val syncButton: ImageButton = itemView.findViewById(R.id.syncButton)
-        val delButton: ImageButton = itemView.findViewById(R.id.deleteButton)
     }
 
 }
