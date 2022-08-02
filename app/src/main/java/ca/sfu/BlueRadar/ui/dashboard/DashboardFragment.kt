@@ -32,7 +32,7 @@ class DashboardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+            ViewModelProvider(this)[DashboardViewModel::class.java]
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -45,10 +45,8 @@ class DashboardFragment : Fragment() {
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
-        if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
-            for(i in deviceViewModel.allEntriesLiveData.value!!) {
-                Log.d("check_from_dash", i.toString())
-            }
+        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+            println("DEVICE: $it\n")
         }
 
         return root

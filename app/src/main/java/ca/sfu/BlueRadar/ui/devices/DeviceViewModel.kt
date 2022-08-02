@@ -46,7 +46,7 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewMo
         }
     }
 
-    fun updateConnected(device: Device) {
+    fun update(device: Device) {
         CoroutineScope(Dispatchers.IO).launch {
             deviceDatabaseDao.update(device)
         }

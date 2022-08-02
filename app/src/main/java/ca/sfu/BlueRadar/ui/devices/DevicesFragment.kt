@@ -26,7 +26,6 @@ import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
-import ca.sfu.BlueRadar.util.Util.removeDuplicates
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
 
@@ -63,9 +62,8 @@ class DevicesFragment : Fragment() {
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
-
                                 i.deviceConnected = true
-                                deviceViewModel.updateConnected(i)
+                                deviceViewModel.update(i)
                                 updateRecyclerView()
                             }
                         }
@@ -89,7 +87,7 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
-                                deviceViewModel.updateConnected(i)
+                                deviceViewModel.update(i)
                                 updateRecyclerView()
                                 val toast: Toast = Toast.makeText(
                                     requireContext(),
@@ -239,7 +237,9 @@ class DevicesFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
         arrayList = ArrayList()
         recyclerAdapter =
-            DeviceRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
+            DeviceRecyclerAdapter(
+                requireActivity(), arrayList, deviceViewModel
+            ) { recyclerAdapter.notifyDataSetChanged() }
 
         when (viewDevices) {
             0 -> {
@@ -269,7 +269,6 @@ class DevicesFragment : Fragment() {
     }
 
     private fun updateRecyclerView() {
-
 
         when (viewDevices) {
             0 -> {

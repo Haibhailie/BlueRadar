@@ -16,13 +16,15 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 class DeviceRecyclerAdapter(
     private val context: Context,
     private var deviceList: List<Device>,
-    private var deviceViewModel: DeviceViewModel
+    private var deviceViewModel: DeviceViewModel,
+    private val onDataSetChanged: () -> Unit
 ) :
     RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>() {
+    private lateinit var view: View
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = View.inflate(context, R.layout.devices_card, null)
+        view = View.inflate(context, R.layout.devices_card, null)
         return ViewHolder(view)
     }
 
@@ -39,7 +41,7 @@ class DeviceRecyclerAdapter(
             holder.deviceIsTrackingTextView.text = "Not Tracking"
             holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
         }
-        //Uncomment when deviceConnected is implemented
+
         if (currItem.deviceConnected) {
             holder.deviceStatusTextView.text = "Connected"
             holder.deviceStatusTextView.setTextColor(Color.GREEN)
@@ -50,19 +52,21 @@ class DeviceRecyclerAdapter(
 
         holder.trackingSwitch.isChecked = currItem.deviceTracking
 
-        holder.trackingSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        holder.trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 //Set the tracking to true here and update the database
                 holder.deviceIsTrackingTextView.text = "Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GREEN)
                 currItem.deviceTracking = true
-                deviceViewModel.updateConnected(currItem)
+                deviceViewModel.update(currItem)
+                println("TRACKING UPDATED: ${deviceViewModel.allEntriesLiveData.value}")
             } else {
                 //Set the tracking to false here and update the database
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
                 currItem.deviceTracking = false
-                deviceViewModel.updateConnected(currItem)
+                deviceViewModel.update(currItem)
+
             }
         }
         holder.navButton.setOnClickListener {
