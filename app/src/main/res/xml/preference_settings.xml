@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Application Preferences"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="preference_account"
+            android:title="Account Settings"
+            android:summary=""
+            app:iconSpaceReserved="false">
+        </Preference>
+        <Preference
+            android:key="preference_date"
+            android:title="Adjust Time Settings"
+            android:summary="Update or sync time settings"
+            app:iconSpaceReserved="false">
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Additional Settings"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="preference_notifications"
+            android:title="Notification Settings"
+            android:summary="Adjust notifications to be enabled or disabled"
+            android:defaultValue="1"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            android:key="preference_data"
+            android:title="Clear Application Data"
+            android:summary="Purge local data"
+            app:iconSpaceReserved="false">
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Misc."
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:title="BlueRadar Webpage"
+            android:summary="About Us, Features, Information"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://haibhailie.github.io/BlueRadar.github.io/#"/>
+        </Preference>
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>
