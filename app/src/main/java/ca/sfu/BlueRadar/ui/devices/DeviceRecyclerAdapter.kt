@@ -27,7 +27,6 @@ class DeviceRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val currItem = deviceList[position]
         //holder.imageView.setImageResource(ItemsViewModel.image)
         holder.deviceNameTextView.text = currItem.deviceName
