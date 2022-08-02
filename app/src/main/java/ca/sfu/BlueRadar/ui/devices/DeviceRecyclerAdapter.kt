@@ -1,19 +1,23 @@
 package ca.sfu.BlueRadar.ui.devices
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
+import ca.sfu.BlueRadar.navigation.NavigationActivity
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-class DeviceRecyclerAdapter(private val context: Context, private var deviceList: List<Device>, private var deviceViewModel: DeviceViewModel) :
+class DeviceRecyclerAdapter(
+    private val context: Context,
+    private var deviceList: List<Device>,
+    private var deviceViewModel: DeviceViewModel
+) :
     RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>() {
 
     // create new views
@@ -37,11 +41,10 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
             holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
         }
         //Uncomment when deviceConnected is implemented
-        if(currItem.deviceConnected){
+        if (currItem.deviceConnected) {
             holder.deviceStatusTextView.text = "Connected"
             holder.deviceStatusTextView.setTextColor(Color.GREEN)
-        }
-        else{
+        } else {
             holder.deviceStatusTextView.text = "Not Connected"
             holder.deviceStatusTextView.setTextColor(Color.RED)
         }
@@ -63,8 +66,11 @@ class DeviceRecyclerAdapter(private val context: Context, private var deviceList
                 deviceViewModel.updateConnected(currItem)
             }
         }
-        holder.navButton.setOnClickListener{
+        holder.navButton.setOnClickListener {
             //Start the location tracking service
+            val navigationIntent = Intent(context, NavigationActivity::class.java)
+            navigationIntent.putExtra("deviceLocation", currItem.deviceLastLocation)
+            context.startActivity(navigationIntent)
         }
     }
 

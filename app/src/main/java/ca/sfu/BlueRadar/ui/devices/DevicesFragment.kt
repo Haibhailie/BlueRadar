@@ -26,7 +26,7 @@ import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
-import ca.sfu.BlueRadar.Util.Util.removeDuplicates
+import ca.sfu.BlueRadar.util.Util.removeDuplicates
 
 
 class DevicesFragment : Fragment() {
