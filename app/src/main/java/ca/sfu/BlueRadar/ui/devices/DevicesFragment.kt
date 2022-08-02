@@ -26,7 +26,7 @@ import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
-import ca.sfu.BlueRadar.Util.Util.removeDuplicates
+import ca.sfu.BlueRadar.util.Util.removeDuplicates
 
 
 class DevicesFragment : Fragment() {
@@ -68,7 +68,6 @@ class DevicesFragment : Fragment() {
                             }
                         }
                     }
-
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
@@ -89,7 +88,7 @@ class DevicesFragment : Fragment() {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
                                 deviceViewModel.updateConnected(i)
-                                println("CONNECTED DEVICE IS: ${i}")
+                                println("CONNECTED DEVICE IS: $i")
                                 updateRecyclerView()
                                 val toast: Toast = Toast.makeText(
                                     requireContext(),
@@ -156,11 +155,8 @@ class DevicesFragment : Fragment() {
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
             addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
         }
-
         requireActivity().registerReceiver(receiver, filter)
-
         firstBootSetup()
-
     }
 
     private fun firstBootSetup() {
@@ -178,19 +174,23 @@ class DevicesFragment : Fragment() {
             val btDevice = Device()
             btDevice.deviceName = deviceName
             btDevice.deviceType = device.type.toString()
-            btDevice.deviceTracking = true
+            btDevice.deviceMacAddress = device.address
 
             var liveList = deviceViewModel.allEntriesLiveData.value
             var isDuplicate = false
+
             if (liveList != null) {
                 for(check in liveList){
                     if(check.deviceName == btDevice.deviceName)
                         isDuplicate = true
                 }
             }
+
             if (!isDuplicate) {
                 deviceViewModel.insert(btDevice)
+                println(btDevice)
             }
+
             val deviceHardwareAddress = device.address // MAC Address
             Log.d("bonded-device-name", btDevice.deviceName)
             Log.d("bonded-device-address", deviceHardwareAddress)
@@ -221,11 +221,11 @@ class DevicesFragment : Fragment() {
         recyclerView = binding.devicesRecycler
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
         arrayList = ArrayList()
-        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList)
+        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
         recyclerView.adapter = recyclerAdapter
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
         arrayList = ArrayList()
-        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList)
+        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
         removeDuplicates(arrayList)
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             recyclerAdapter.replace(it)

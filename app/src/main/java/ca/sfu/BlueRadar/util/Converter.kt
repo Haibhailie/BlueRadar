@@ -1,4 +1,4 @@
-package ca.sfu.BlueRadar.Util
+package ca.sfu.BlueRadar.util
 
 import androidx.room.TypeConverter
 import com.google.android.gms.maps.model.LatLng

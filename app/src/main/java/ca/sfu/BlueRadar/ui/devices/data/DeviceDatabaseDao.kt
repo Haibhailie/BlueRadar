@@ -22,7 +22,7 @@ interface DeviceDatabaseDao {
     //It supports coroutines throughout its API, so you can transform a flow using coroutines as well!
     //Code inside the flow { ... } builder block can suspend. So the function is no longer marked with suspend modifier.
     //See more details here: https://kotlinlang.org/docs/flow.html#flows
-    @Query("SELECT * FROM device_table")
+    @Query("SELECT DISTINCT * FROM device_table GROUP BY device_mac_address")
     fun getAllEntries(): Flow<List<Device>>
 
     @Query("DELETE FROM device_table")

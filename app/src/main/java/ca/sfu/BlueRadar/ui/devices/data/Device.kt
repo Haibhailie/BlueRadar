@@ -1,5 +1,6 @@
 package ca.sfu.BlueRadar.ui.devices.data
 
+import android.net.MacAddress
 import androidx.room.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
@@ -30,7 +31,10 @@ data class Device(
     var deviceLastLocation: LatLng? = LatLng(0.0,0.0),
 
     @ColumnInfo(name = "device_connected")
-    var deviceConnected: Boolean = false
+    var deviceConnected: Boolean = false,
+
+    @ColumnInfo(name = "device_mac_address")
+    var deviceMacAddress: String = ""
 )
 
 class ArrayConverter {

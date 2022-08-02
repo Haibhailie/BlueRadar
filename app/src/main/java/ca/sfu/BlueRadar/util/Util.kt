@@ -1,4 +1,4 @@
-package ca.sfu.BlueRadar.Util
+package ca.sfu.BlueRadar.util
 
 object Util {
 
