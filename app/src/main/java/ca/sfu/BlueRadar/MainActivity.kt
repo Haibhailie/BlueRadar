@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +22,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.ui.menu.OptionsActivity
+import ca.sfu.BlueRadar.ui.menu.SettingsActivity
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -69,11 +73,14 @@ class MainActivity : AppCompatActivity() {
 
         burgerView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.burger_settings ->
+                R.id.burger_settings -> {
                     Toast.makeText(applicationContext, "Settings Page", Toast.LENGTH_SHORT).show()
-
-                R.id.burger_options ->
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+                R.id.burger_options -> {
                     Toast.makeText(applicationContext, "Options Page", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, OptionsActivity::class.java))
+                }
 
                 R.id.burger_logout ->
                     Toast.makeText(applicationContext, "Logged Out", Toast.LENGTH_SHORT).show()
