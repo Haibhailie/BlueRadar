@@ -50,6 +50,8 @@ class DashboardFragment : Fragment() {
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
+        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+            println("DEVICE: $it\n")
         if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
             setupRecyclerView()
             for(i in deviceViewModel.allEntriesLiveData.value!!) {

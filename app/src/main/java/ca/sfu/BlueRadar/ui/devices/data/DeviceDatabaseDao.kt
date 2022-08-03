@@ -28,6 +28,9 @@ interface DeviceDatabaseDao {
     @Query("SELECT DISTINCT * FROM device_table WHERE device_tracking = :bool GROUP BY device_mac_address")
     fun getAllActiveEntries(bool: Boolean): Flow<List<Device>>
 
+    @Query("SELECT DISTINCT * FROM device_table WHERE device_tracking = :bool GROUP BY device_mac_address")
+    fun getAllInactiveEntries(bool: Boolean): Flow<List<Device>>
+
     @Query("DELETE FROM device_table")
     fun deleteAll()
 
