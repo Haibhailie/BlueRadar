@@ -20,6 +20,10 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewMo
     val allEntriesLiveData: LiveData<List<Device>> = deviceDatabaseDao.getAllEntries()
         .asLiveData()
 
+    val activeEntriesLiveData: LiveData<List<Device>> = deviceDatabaseDao.getAllActiveEntries(true)
+        .asLiveData()
+
+
     fun insert(entry: Device) {
         CoroutineScope(Dispatchers.IO).launch {
             deviceDatabaseDao.insertEntry(entry)
