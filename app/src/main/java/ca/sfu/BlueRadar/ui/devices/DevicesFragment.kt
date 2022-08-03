@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -60,12 +61,28 @@ class DevicesFragment : Fragment() {
                             .EXTRA_DEVICE
                     )
                     val temp = deviceViewModel.allEntriesLiveData.value
+                    var currentLoc = LatLng(0.0, 0.0)
+                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
+                        currentLoc = it
+                    }
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
+
                                 i.deviceConnected = true
                                 deviceViewModel.update(i)
+                                if (i.deviceTracking == true) {
+                                    i.deviceLastLocation = currentLoc
+                                }
                                 updateRecyclerView()
+                                // Testing - delete after
+                                val toast: Toast = Toast.makeText(
+                                    requireContext(),
+                                    "Current Loc: ${currentLoc.latitude}, ${currentLoc.longitude}",
+                                    Toast
+                                        .LENGTH_SHORT
+                                )
+                                toast.show()
                             }
                         }
                     }
@@ -133,7 +150,6 @@ class DevicesFragment : Fragment() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bluetoothManager = getSystemService(requireContext(), BluetoothManager::class.java)!!
@@ -166,6 +182,7 @@ class DevicesFragment : Fragment() {
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel =
             ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+
 
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
         pairedDevices?.forEach { device ->
