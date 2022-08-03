@@ -14,4 +14,13 @@
         android:layout_height="match_parent"
         tools:context=".start_fragment.MapsActivity" />
 
+    <Button
+        android:id="@+id/open_google_map_button"
+        android:layout_width="wrap_content"
+        android:layout_height="50sp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="10sp"
+        android:backgroundTint="@color/primary"
+        android:text="@string/open_gm_button"/>
+
 </FrameLayout>

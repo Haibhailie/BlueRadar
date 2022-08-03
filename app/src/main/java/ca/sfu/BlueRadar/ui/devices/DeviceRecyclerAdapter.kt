@@ -70,6 +70,7 @@ class DeviceRecyclerAdapter(
             //Start the location tracking service
             val navigationIntent = Intent(context, NavigationActivity::class.java)
             navigationIntent.putExtra("deviceLocation", currItem.deviceLastLocation)
+            navigationIntent.putExtra("deviceName", currItem.deviceName)
             context.startActivity(navigationIntent)
         }
     }

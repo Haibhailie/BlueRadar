@@ -30,4 +30,7 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <!-- Navigation Activity -->
+    <string name="open_gm_button">Open in Google Maps</string>
 </resources>

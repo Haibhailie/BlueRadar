@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -57,14 +58,29 @@ class DevicesFragment : Fragment() {
                             .EXTRA_DEVICE
                     )
                     val temp = deviceViewModel.allEntriesLiveData.value
+                    var currentLoc = LatLng(0.0, 0.0)
+                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
+                        currentLoc = it
+                    }
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
 
                                 i.deviceConnected = true
+                                if (i.deviceTracking == true) {
+                                    i.deviceLastLocation = currentLoc
+                                }
                                 deviceViewModel.updateConnected(i)
                                 println("CONNECTED DEVICE IS: ${i}")
                                 updateRecyclerView()
+                                // Testing - delete after
+                                val toast: Toast = Toast.makeText(
+                                    requireContext(),
+                                    "Current Loc: ${currentLoc.latitude}, ${currentLoc.longitude}",
+                                    Toast
+                                        .LENGTH_SHORT
+                                )
+                                toast.show()
                             }
                         }
                     }
