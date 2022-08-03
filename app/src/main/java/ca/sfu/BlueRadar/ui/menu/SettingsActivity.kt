@@ -6,12 +6,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceFragmentCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
 
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Set theme based on user preferences
+        setCustomTheme()
         setContentView(R.layout.activity_settings)
         if(savedInstanceState == null) {
             supportFragmentManager
@@ -20,6 +23,21 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         showUpButton()
+    }
+
+    override fun onResume() {
+        setCustomTheme()
+        super.onResume()
+    }
+
+    private fun setCustomTheme() {
+        val theme = PreferenceManager.getDefaultSharedPreferences(this).getString("options_colours", "AppTheme")
+        println("debug: theme name $theme")
+        when (theme) {
+            "AppTheme" -> setTheme(R.style.AppTheme)
+            "AppThemeRed" -> setTheme(R.style.AppThemeRed)
+            "AppThemeBlue" -> setTheme(R.style.AppThemeBlue)
+        }
     }
 
     class SettingsFragment: PreferenceFragmentCompat() {
