@@ -60,4 +60,7 @@
     <string name="about_fe">Jobless software developer looking for job opportunities. Fourth year SFU CS student with some experience in Java, Kotlin, C++, and K-Pop. Considers cryptocurrency mining is more important than gaming with GPUs.</string>
     <string name="julian_chan">Julian Chan</string>
     <string name="about_julian">Interests in weird things and avid procrastinator. I will probably work on anything but don\'t expect it to look nice. Does not understand why NFT\'s work, why people like them, and wants to sell stupid ones to people.</string>
+
+    <!-- Navigation Activity -->
+    <string name="open_gm_button">Open in Google Maps</string>
 </resources>
