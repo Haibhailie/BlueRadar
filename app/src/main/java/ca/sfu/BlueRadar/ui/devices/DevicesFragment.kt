@@ -22,12 +22,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
-import ca.sfu.BlueRadar.util.Util.removeDuplicates
-
+import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
 class DevicesFragment : Fragment() {
 
@@ -37,6 +37,7 @@ class DevicesFragment : Fragment() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothDevices: ArrayList<String> = ArrayList()
     private var deviceAddresses: ArrayList<String> = ArrayList()
+    private var viewDevices = 0
 
     private val binding get() = _binding!!
     private lateinit var database: DeviceDatabase
@@ -46,6 +47,7 @@ class DevicesFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
+    private lateinit var buttonGroup: ThemedToggleButtonGroup
 
     private val receiver = object : BroadcastReceiver() {
 
@@ -61,10 +63,8 @@ class DevicesFragment : Fragment() {
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
-
                                 i.deviceConnected = true
-                                deviceViewModel.updateConnected(i)
-                                println("CONNECTED DEVICE IS: ${i}")
+                                deviceViewModel.update(i)
                                 updateRecyclerView()
                             }
                         }
@@ -88,8 +88,7 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
-                                deviceViewModel.updateConnected(i)
-                                println("CONNECTED DEVICE IS: $i")
+                                deviceViewModel.update(i)
                                 updateRecyclerView()
                                 val toast: Toast = Toast.makeText(
                                     requireContext(),
@@ -134,6 +133,7 @@ class DevicesFragment : Fragment() {
         }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bluetoothManager = getSystemService(requireContext(), BluetoothManager::class.java)!!
@@ -167,7 +167,6 @@ class DevicesFragment : Fragment() {
         deviceViewModel =
             ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
 
-
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
         pairedDevices?.forEach { device ->
             val deviceName = device.name
@@ -181,15 +180,14 @@ class DevicesFragment : Fragment() {
             var isDuplicate = false
 
             if (liveList != null) {
-                for(check in liveList){
-                    if(check.deviceName == btDevice.deviceName)
+                for (check in liveList) {
+                    if (check.deviceName == btDevice.deviceName)
                         isDuplicate = true
                 }
             }
 
             if (!isDuplicate) {
                 deviceViewModel.insert(btDevice)
-                println(btDevice)
             }
 
             val deviceHardwareAddress = device.address // MAC Address
@@ -207,45 +205,99 @@ class DevicesFragment : Fragment() {
         bluetoothAdapter.startDiscovery()
     }
 
-    override fun onPause() {
-        super.onPause()
+    private fun setupButtonGroupListener() {
+        buttonGroup.selectButton(binding.allDeviceButton)
+        buttonGroup.setOnSelectListener {
+            viewDevices = when (it) {
+                binding.allDeviceButton -> {
+                    0
+                }
+                binding.activeDeviceButton -> {
+                    1
+                }
+                else -> {
+                    2
+                }
+            }
+            updateRecyclerView()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        removeDuplicates(arrayList)
         updateRecyclerView()
     }
 
-
     private fun setupRecyclerView() {
-        recyclerView = binding.devicesRecycler
-        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
-        arrayList = ArrayList()
-        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
-        recyclerView.adapter = recyclerAdapter
-        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
-        arrayList = ArrayList()
-        recyclerAdapter = DeviceRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
-        removeDuplicates(arrayList)
-        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-            recyclerAdapter.replace(it)
-            recyclerAdapter.notifyDataSetChanged()
-        }
-        recyclerView.adapter = recyclerAdapter
 
+        recyclerView = binding.devicesRecyclerActive
+        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
+        arrayList = ArrayList()
+        recyclerAdapter =
+            DeviceRecyclerAdapter(
+                requireActivity(), arrayList, deviceViewModel
+            )
+
+        when (viewDevices) {
+            0 -> {
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
+            1 -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
+            else -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        recyclerView.adapter = recyclerAdapter
         recyclerView.addItemDecoration(
             MarginItemDecoration(25)
         )
     }
 
-    private fun updateRecyclerView  () {
+    private fun updateRecyclerView() {
 
-        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-            recyclerAdapter.replace(it)
-            recyclerAdapter.notifyDataSetChanged()
+        when (viewDevices) {
+            0 -> {
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
+            1 -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
+            else -> {
+                //Change this once Mongo Migration is complete
+                requireActivity().viewModelStore.clear()
+                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+                    recyclerAdapter.replace(it)
+                    recyclerAdapter.notifyDataSetChanged()
+                }
+            }
         }
-
+        recyclerView.adapter = recyclerAdapter
     }
 
     override fun onCreateView(
@@ -256,7 +308,9 @@ class DevicesFragment : Fragment() {
 
         _binding = FragmentDevicesBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        buttonGroup = binding.deviceTrackingFilter
         setupRecyclerView()
+        setupButtonGroupListener()
         return root
     }
 

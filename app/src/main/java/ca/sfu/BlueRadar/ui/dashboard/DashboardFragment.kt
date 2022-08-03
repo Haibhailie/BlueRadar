@@ -45,10 +45,8 @@ class DashboardFragment : Fragment() {
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
-        if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
-            for(i in deviceViewModel.allEntriesLiveData.value!!) {
-                Log.d("check_from_dash", i.toString())
-            }
+        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+            println("DEVICE: $it\n")
         }
 
         return root
