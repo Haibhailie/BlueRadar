@@ -11,6 +11,15 @@
         android:gravity="center"
         tools:context=".ui.devices.DevicesFragment"
         >
+        <TextView
+            android:id="@+id/dashboardTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Tracking Devices"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_margin="5dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/devicesRecyclerDashboard"

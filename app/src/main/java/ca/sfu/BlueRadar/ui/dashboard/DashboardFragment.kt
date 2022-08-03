@@ -1,6 +1,6 @@
 package ca.sfu.BlueRadar.ui.dashboard
 
-import android.bluetooth.BluetoothDevice
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -13,10 +13,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
-import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
-import ca.sfu.BlueRadar.ui.devices.DevicesFragment
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
@@ -53,18 +51,17 @@ class DashboardFragment : Fragment() {
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
         if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
-//            if(!deviceViewModel.activeEntriesLiveData.value.isNullOrEmpty()) {
-//                setupRecyclerView()
-//                for(i in deviceViewModel.activeEntriesLiveData.value!!) {
-//                    Log.d("check_from_dash_active", i.toString())
-//                }
-//            }
             setupRecyclerView()
             for(i in deviceViewModel.allEntriesLiveData.value!!) {
                 Log.d("check_from_dash", i.toString())
             }
+        } else {
+            val textView: TextView = binding.dashboardTitle
+            dashboardViewModel.text.observe(viewLifecycleOwner) {
+                textView.text = it
+                textView.setTextColor(Color.GRAY)
+            }
         }
-
         return root
     }
 
