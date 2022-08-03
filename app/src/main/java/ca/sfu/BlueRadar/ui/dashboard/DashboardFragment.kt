@@ -52,6 +52,7 @@ class DashboardFragment : Fragment() {
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel =
             ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             println("DEVICE: $it\n")
             if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
@@ -61,8 +62,8 @@ class DashboardFragment : Fragment() {
                 }
             } else {
                 val textView: TextView = binding.dashboardTitle
-                dashboardViewModel.text.observe(viewLifecycleOwner) {
-                    textView.text = it
+                dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+                    textView.text = g
                     textView.setTextColor(Color.GRAY)
                 }
             }
