@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
 class DevicesFragment : Fragment() {
+
     private var _binding: FragmentDevicesBinding? = null
     private var deviceNameList: ArrayList<String> = ArrayList()
     private lateinit var bluetoothManager: BluetoothManager
