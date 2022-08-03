@@ -20,6 +20,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Set theme based on preferences
-//        setTheme(R.style.AppThemeBlue)
+        setCustomTheme()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -53,6 +54,18 @@ class MainActivity : AppCompatActivity() {
         setupBurgerMenuNavigation()
         checkPermissions()
         startLocationTrackingService()
+    }
+
+    override fun onRestart() {
+        println("debug: onRestart called")
+        setCustomTheme()
+        super.onResume()
+    }
+
+    override fun onStart() {
+        println("debug: onStart called")
+        setCustomTheme()
+        super.onStart()
     }
 
     private fun setupBurgerMenuNavigation() {
@@ -106,6 +119,16 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    private fun setCustomTheme() {
+        val theme = PreferenceManager.getDefaultSharedPreferences(this).getString("options_colours", "AppTheme")
+        println("debug: theme name $theme")
+        when (theme) {
+            "AppTheme" -> setTheme(R.style.AppTheme)
+            "AppThemeRed" -> setTheme(R.style.AppThemeRed)
+            "AppThemeBlue" -> setTheme(R.style.AppThemeBlue)
+        }
     }
 
     fun checkPermissions() {
