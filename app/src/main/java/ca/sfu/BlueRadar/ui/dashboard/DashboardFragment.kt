@@ -53,6 +53,12 @@ class DashboardFragment : Fragment() {
         viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel = ViewModelProvider(requireActivity(),viewModelFactory)[DeviceViewModel::class.java]
         if(!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()){
+//            if(!deviceViewModel.activeEntriesLiveData.value.isNullOrEmpty()) {
+//                setupRecyclerView()
+//                for(i in deviceViewModel.activeEntriesLiveData.value!!) {
+//                    Log.d("check_from_dash_active", i.toString())
+//                }
+//            }
             setupRecyclerView()
             for(i in deviceViewModel.allEntriesLiveData.value!!) {
                 Log.d("check_from_dash", i.toString())

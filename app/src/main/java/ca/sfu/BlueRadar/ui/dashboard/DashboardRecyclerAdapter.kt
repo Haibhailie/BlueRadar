@@ -14,6 +14,8 @@ import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.navigation.NavigationActivity
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.material.switchmaterial.SwitchMaterial
+import org.w3c.dom.Text
+import java.text.DecimalFormat
 
 class DashboardRecyclerAdapter(
     private val context: Context,
@@ -50,6 +52,19 @@ class DashboardRecyclerAdapter(
             holder.deviceStatusTextView.setTextColor(Color.RED)
         }
 
+        if(currItem.deviceMacAddress.isNotEmpty()) {
+            holder.deviceMacAddTextView.text = "MAC Address: ${currItem.deviceMacAddress}"
+        }
+
+        val df = DecimalFormat("#.##")
+
+        if(currItem.deviceLastLocation != null) {
+            holder.deviceLatLngTextView.text = "Last Location (Lat/Lon): ${df.format(currItem
+                .deviceLastLocation!!
+                .latitude)}, ${df.format(currItem.deviceLastLocation!!
+                .longitude)}"
+        }
+
         holder.navButton.setOnClickListener {
             //Start the location tracking service
             val navigationIntent = Intent(context, NavigationActivity::class.java)
@@ -71,7 +86,10 @@ class DashboardRecyclerAdapter(
         val deviceNameTextView: TextView = itemView.findViewById(R.id.deviceNameTextViewD)
         val deviceStatusTextView: TextView = itemView.findViewById(R.id.deviceStatusTextViewD)
         val deviceIsTrackingTextView: TextView = itemView.findViewById(R.id.deviceTrackingTextViewD)
+        val deviceMacAddTextView: TextView = itemView.findViewById(R.id.deviceMacAddTextViewD)
+        val deviceLatLngTextView: TextView = itemView.findViewById(R.id.deviceLatLngTextViewD)
         val navButton: Button = itemView.findViewById(R.id.navigateButtonD)
+
     }
 
 }
