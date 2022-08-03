@@ -74,7 +74,6 @@ class DevicesFragment : Fragment() {
                                 if (i.deviceTracking == true) {
                                     i.deviceLastLocation = currentLoc
                                 }
-                                deviceViewModel.updateConnected(i)
                                 updateRecyclerView()
                                 // Testing - delete after
                                 val toast: Toast = Toast.makeText(
