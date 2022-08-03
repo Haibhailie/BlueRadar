@@ -67,6 +67,11 @@
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationTrackingService" />
+        <activity android:name=".ui.menu.SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".ui.menu.OptionsActivity"
+            android:parentActivityName=".MainActivity"/>
 
         <activity
             android:name=".MainActivity"

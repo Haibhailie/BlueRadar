@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Application Preferences"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="options_colours"
+            android:title="Application Colour Theme"
+            android:summary="Change the outline colours!"
+            android:entryValues="@array/options_values"
+            app:entries="@array/options_colours"
+            app:iconSpaceReserved="false">
+        </ListPreference>
+        <SwitchPreference
+            android:key="options_map_dark_mode"
+            android:title="Map Dark Mode"
+            android:summary="Tap to switch on or off"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false">
+        </SwitchPreference>
+
+    </PreferenceCategory>
+
+
+</androidx.preference.PreferenceScreen>
