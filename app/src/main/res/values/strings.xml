@@ -5,8 +5,8 @@
     <string name="title_map">Map</string>
     <string name="default_username">Pikachu</string>
     <string name="default_email">pikachu@pokemon.com</string>
-    <string name="settings">Settings</string>
-    <string name="options">Options</string>
+    <string name="settings">User Settings</string>
+    <string name="options">App Options</string>
     <string name="log_out">Log Out</string>
     <string name="preferences">Preferences</string>
     <string name="open">Open</string>
@@ -30,6 +30,36 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <!--  Strings and elements used in Preferences (Both settings preference and options preference  -->
+    <string-array name="options_colours">
+        <item>Red</item>
+        <item>Orange</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Green</item>
+        <item>Purple</item>
+    </string-array>
+    <string-array name="options_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string name="about">About</string>
+    <string name="about_the_developers">About The Developers</string>
+    <string name="about_blueradar">About BlueRadar</string>
+    <string name="about_app_text">The revolutionary upgrades in IoT and the immense love towards losing cables in our recent technological trends has led to a massive outburst in the number of wireless devices we use. Sometimes, we know that it gets a little overwhelming for everyone. Don\'t worry though, we\'ve got you. BlueRadar is a unified system that can manage, track and locate all the devices that you\'ve paired with your Android smartphone.</string>
+    <string name="shashank_thanalapati">Shashank Thanalapati</string>
+    <string name="about_shanks">Avid PC Building enthusiast, gamer and always on the latest version of Ubuntu. Considers Java as the almighty programming language and reccommends it for everyone\'s use for everything.</string>
+    <string name="lynn_nguyen">Lynn Nguyen</string>
+    <string name="about_lynn">Third year SFU Software Systems student with a strong passion in Android development and aspire to become a full stack software developer at a company in the leagues of FAANG.</string>
+    <string name="shan_ying_yang">Shan Ying Yang</string>
+    <string name="about_fe">Jobless software developer looking for job opportunities. Fourth year SFU CS student with some experience in Java, Kotlin, C++, and K-Pop. Considers cryptocurrency mining is more important than gaming with GPUs.</string>
+    <string name="julian_chan">Julian Chan</string>
+    <string name="about_julian">Interests in weird things and avid procrastinator. I will probably work on anything but don\'t expect it to look nice. Does not understand why NFT\'s work, why people like them, and wants to sell stupid ones to people.</string>
 
     <!-- Navigation Activity -->
     <string name="open_gm_button">Open in Google Maps</string>

@@ -1,6 +1,5 @@
 package ca.sfu.BlueRadar.ui.devices.data
 
-import android.net.MacAddress
 import androidx.room.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson

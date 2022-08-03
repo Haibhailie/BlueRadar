@@ -37,12 +37,18 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/blueradar_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/blueradar_logo"
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme"
         tools:targetApi="31">
+        <activity
+            android:name="ca.sfu.BlueRadar.about.AboutApplication"
+            android:exported="false" />
+        <activity
+            android:name="ca.sfu.BlueRadar.about.AboutDevelopers"
+            android:exported="false" />
         <activity
             android:name="ca.sfu.BlueRadar.navigation.NavigationActivity"
             android:exported="false"
@@ -61,6 +67,14 @@
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationTrackingService" />
+        <activity android:name=".ui.menu.SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".ui.menu.OptionsActivity"
+            android:parentActivityName=".MainActivity"/>
+        <service
+            android:name=".services.NotificationService"
+            android:enabled="true" />
 
         <activity
             android:name=".MainActivity"
