@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -70,7 +71,7 @@ class DashboardRecyclerAdapter(
         val deviceNameTextView: TextView = itemView.findViewById(R.id.deviceNameTextViewD)
         val deviceStatusTextView: TextView = itemView.findViewById(R.id.deviceStatusTextViewD)
         val deviceIsTrackingTextView: TextView = itemView.findViewById(R.id.deviceTrackingTextViewD)
-        val navButton: ImageButton = itemView.findViewById(R.id.navigateButtonD)
+        val navButton: Button = itemView.findViewById(R.id.navigateButtonD)
     }
 
 }

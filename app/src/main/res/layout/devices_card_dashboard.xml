@@ -12,37 +12,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
         android:paddingStart="15dp"
-        android:paddingEnd="15dp">
+        android:paddingTop="15dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="15dp">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/pikachu" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/deviceNameTextViewD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Item"
-                    android:maxLength="24"
                     android:ellipsize="end"
+                    android:maxLength="24"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Item"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -50,7 +48,7 @@
                     android:id="@+id/deviceStatusTextViewD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center_horizontal"
                     android:text="IsConnected"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -59,22 +57,26 @@
                     android:id="@+id/deviceTrackingTextViewD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center_horizontal"
                     android:text="IsTracking"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:gravity="end"
-                android:orientation="horizontal">
-                <ImageButton
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <Button
                     android:id="@+id/navigateButtonD"
+                    android:layout_marginTop="10dp"
                     android:layout_width="wrap_content"
+                    android:drawableLeft="@drawable/ic_baseline_navigation_24"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_baseline_navigation_24" />
+                    android:text="Locate"
+                     />
             </LinearLayout>
 
 

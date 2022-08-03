@@ -48,10 +48,6 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.textDashboard
-//        dashboardViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         database = DeviceDatabase.getInstance(requireActivity())
         databaseDao = database.deviceDatabaseDao
         viewModelFactory = DeviceViewModelFactory(databaseDao)
@@ -62,8 +58,6 @@ class DashboardFragment : Fragment() {
                 Log.d("check_from_dash", i.toString())
             }
         }
-
-
 
         return root
     }
