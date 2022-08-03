@@ -44,6 +44,12 @@
         android:theme="@style/MyAppTheme"
         tools:targetApi="31">
         <activity
+            android:name="ca.sfu.BlueRadar.about.AboutApplication"
+            android:exported="false" />
+        <activity
+            android:name="ca.sfu.BlueRadar.about.AboutDevelopers"
+            android:exported="false" />
+        <activity
             android:name="ca.sfu.BlueRadar.navigation.NavigationActivity"
             android:exported="false"
             android:label="@string/title_activity_navigation"
