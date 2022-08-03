@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         tools:context=".ui.devices.DevicesFragment"
         >
@@ -15,10 +16,9 @@
             android:id="@+id/dashboardTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center_horizontal"
             android:text="Tracking Devices"
-            android:textStyle="bold"
             android:textSize="20sp"
-            android:textColor="@color/black"
             android:layout_margin="5dp" />
 
         <androidx.recyclerview.widget.RecyclerView
