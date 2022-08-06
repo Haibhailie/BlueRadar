@@ -59,12 +59,10 @@ class DevicesFragment : Fragment() {
         }
 
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
-        firstBootSetup()
+        deviceViewModel = BluetoothService.deviceViewModel
+
     }
 
-    private fun firstBootSetup() {
-        deviceViewModel = BluetoothService.deviceViewModel
-    }
 
     private fun setupButtonGroupListener() {
         buttonGroup.selectButton(binding.allDeviceButton)
@@ -178,8 +176,7 @@ class DevicesFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-        //deviceViewModel.deleteAll()
-        requireActivity().unregisterReceiver(BluetoothService.receiver)
+
     }
 
     class MarginItemDecoration(private val spaceSize: Int) : RecyclerView.ItemDecoration() {
