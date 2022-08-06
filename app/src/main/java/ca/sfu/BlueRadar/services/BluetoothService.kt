@@ -1,12 +1,19 @@
 package ca.sfu.BlueRadar.services
 
-
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
+import androidx.core.content.ContextCompat
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.data.Device
+import com.google.android.gms.maps.model.LatLng
+import kotlin.collections.ArrayList
 
 
 class BluetoothService : Service() {
@@ -16,12 +23,49 @@ class BluetoothService : Service() {
         lateinit var deviceViewModel: DeviceViewModel
         lateinit var bluetoothManager: BluetoothManager
         lateinit var bluetoothAdapter: BluetoothAdapter
+        lateinit var receiver: BroadcastReceiver
+        lateinit var pairedDevices: Set<BluetoothDevice>
+
+        var deviceNameList: ArrayList<String> = ArrayList()
     }
 
     override fun onCreate() {
         super.onCreate()
         println("debug: onCreate called")
+        receiver = receiverSkeleton
+        bluetoothManager = ContextCompat.getSystemService(
+            this,
+            BluetoothManager::class.java
+        )!!
+        bluetoothAdapter = bluetoothManager.adapter
+        setupPairedDevices()
+    }
 
+    fun setupPairedDevices() {
+        pairedDevices = bluetoothAdapter.bondedDevices
+        pairedDevices.forEach { device ->
+            val deviceName = device.name
+            deviceNameList.add(deviceName)
+            val btDevice = Device()
+            btDevice.deviceName = deviceName
+            btDevice.deviceType = device.type.toString()
+            btDevice.deviceMacAddress = device.address
+
+            var liveList = deviceViewModel.allEntriesLiveData.value
+            var isDuplicate = false
+
+            if (liveList != null) {
+                for (check in liveList) {
+                    if (check.deviceName == btDevice.deviceName)
+                        isDuplicate = true
+                }
+            }
+
+            if (!isDuplicate) {
+                deviceViewModel.insert(btDevice)
+            }
+        }
+        bluetoothAdapter.startDiscovery()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -39,4 +83,84 @@ class BluetoothService : Service() {
         return null
     }
 
+    //Bluetooth broadcast receiver
+    private val receiverSkeleton = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+
+                    //Check if any paired bluetooth devices are available
+                    val device: BluetoothDevice? = intent.getParcelableExtra(
+                        BluetoothDevice
+                            .EXTRA_DEVICE
+                    )
+                    val temp = deviceViewModel.allEntriesLiveData.value
+                    var currentLoc = LatLng(0.0, 0.0)
+
+                    LocationTrackingService.currentPoint.observeForever() {
+                        currentLoc = it
+                    }
+
+                    //Save device to database on connect if not already available (new device sync)
+                    if (temp?.isNotEmpty() == true && device != null) {
+                        for (i in temp) {
+                            if (i.deviceName == device.name) {
+
+                                i.deviceConnected = true
+                                deviceViewModel.update(i)
+                                if (i.deviceTracking) {
+                                    i.deviceLastLocation = currentLoc
+                                }
+                            }
+                        }
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
+                }
+
+                //Save latlng upon disconnect and update status
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    val g: ArrayList<LatLng?> = ArrayList()
+                    g.add(LocationTrackingService.currentPoint.value)
+                    val device: BluetoothDevice? = intent.getParcelableExtra(
+                        BluetoothDevice
+                            .EXTRA_DEVICE
+                    )
+                    val dbList = deviceViewModel.allEntriesLiveData.value
+                    var lastLoc = LatLng(0.0, 0.0)
+                    LocationTrackingService.currentPoint.observeForever() {
+                        lastLoc = it
+                    }
+                    if (dbList?.isNotEmpty() == true && device != null) {
+                        for (i in dbList) {
+                            if (i.deviceName == device.name) {
+                                i.deviceConnected = false
+                                i.deviceLastLocation = lastLoc
+                                deviceViewModel.update(i)
+
+                            }
+                        }
+                    }
+                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
+                        Log.d("check me", i.toString())
+                    }
+                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
+                }
+
+                //Add device to arrayList
+                BluetoothDevice.ACTION_FOUND -> {
+                    // Discovery has found a device. Get the BluetoothDevice
+                    // object and its info from the Intent.
+                    val device: BluetoothDevice? =
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val deviceName = device?.name
+                    val deviceHardwareAddress = device?.address // MAC address
+                    val rssi: String = intent.getShortExtra(
+                        BluetoothDevice.EXTRA_RSSI, Short
+                            .MIN_VALUE
+                    ).toString()
+                }
+            }
+        }
+    }
 }

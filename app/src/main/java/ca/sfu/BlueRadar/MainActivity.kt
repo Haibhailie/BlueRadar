@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var locationTrackingServiceIntent: Intent
     private lateinit var databaseService: Intent
+    private lateinit var bluetoothService: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +51,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        startLocationTrackingService()
+        startDatabaseService()
+        startBluetoothService()
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
         checkPermissions()
-        startLocationTrackingService()
-        startDatabaseService()
     }
 
     override fun onRestart() {
@@ -163,6 +165,11 @@ class MainActivity : AppCompatActivity() {
     private fun startDatabaseService(){
         databaseService = Intent(this, DatabaseService::class.java)
         this.startService(databaseService)
+    }
+
+    private fun startBluetoothService(){
+        bluetoothService = Intent(this, BluetoothService::class.java)
+        this.startService(bluetoothService)
     }
 
     override fun onDestroy() {

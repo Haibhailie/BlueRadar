@@ -70,6 +70,8 @@
 
         <service android:name=".services.DatabaseService" />
 
+        <service android:name=".services.BluetoothService" />
+
         <activity
             android:name=".ui.menu.SettingsActivity"
             android:parentActivityName=".MainActivity" />

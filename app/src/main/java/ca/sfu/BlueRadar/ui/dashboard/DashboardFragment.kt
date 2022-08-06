@@ -1,5 +1,7 @@
 package ca.sfu.BlueRadar.ui.dashboard
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -8,11 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
+import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
@@ -26,6 +31,9 @@ class DashboardFragment : Fragment() {
     private lateinit var databaseDao: DeviceDatabaseDao
     private lateinit var viewModelFactory: DeviceViewModelFactory
     private lateinit var deviceViewModel: DeviceViewModel
+
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothAdapter: BluetoothAdapter
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
@@ -53,6 +61,13 @@ class DashboardFragment : Fragment() {
         deviceViewModel =
             ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
 
+        bluetoothManager = ContextCompat.getSystemService(
+            requireContext(),
+            BluetoothManager::class.java
+        )!!
+        bluetoothAdapter = bluetoothManager.adapter
+        requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
+
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             println("DEVICE: $it\n")
             if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
@@ -71,26 +86,31 @@ class DashboardFragment : Fragment() {
         return root
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (this::recyclerAdapter.isInitialized) {
+            recyclerAdapter.notifyDataSetChanged()
+        }
+    }
+
     fun setupRecyclerView() {
         recyclerView = binding.devicesRecyclerDashboard
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
         arrayList = ArrayList()
+
         recyclerAdapter =
-            DashboardRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
-        recyclerView.adapter = recyclerAdapter
-        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
-        arrayList = ArrayList()
-        recyclerAdapter =
-            DashboardRecyclerAdapter(requireActivity(), arrayList, deviceViewModel)
-        Util.removeDuplicates(arrayList)
+            DashboardRecyclerAdapter(
+                requireActivity(), arrayList, deviceViewModel
+            )
+
         deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
             recyclerAdapter.replace(it)
             recyclerAdapter.notifyDataSetChanged()
         }
-        recyclerView.adapter = recyclerAdapter
 
+        recyclerView.adapter = recyclerAdapter
         recyclerView.addItemDecoration(
-            MarginItemDecoration(25)
+            DevicesFragment.MarginItemDecoration(25)
         )
     }
 
