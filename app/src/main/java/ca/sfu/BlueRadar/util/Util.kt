@@ -2,7 +2,12 @@ package ca.sfu.BlueRadar.util
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.Context
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.net.Uri
 
 object Util {
 
@@ -29,5 +34,10 @@ object Util {
         addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
+    }
+    fun getBitmap(context: Context, imgUri: Uri): Bitmap {
+        var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(imgUri))
+        val matrix = Matrix()
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }

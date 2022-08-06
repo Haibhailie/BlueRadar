@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.R
+import ca.sfu.BlueRadar.util.Util
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
