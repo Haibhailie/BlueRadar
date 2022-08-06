@@ -106,9 +106,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, OptionsActivity::class.java))
                 }
 
-                R.id.burger_logout ->
-                    Toast.makeText(applicationContext, "Logged Out", Toast.LENGTH_SHORT).show()
-
                 R.id.burger_about_devs -> {
                     startActivity(Intent(this, AboutDevelopers::class.java))
                 }
