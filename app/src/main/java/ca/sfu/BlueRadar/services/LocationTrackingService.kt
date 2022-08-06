@@ -18,8 +18,9 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.maps.model.LatLng
+import java.lang.Exception
 
-class LocationTrackingService: LifecycleService() {
+class LocationTrackingService : LifecycleService() {
 
     private lateinit var myBroadcastReceiver: MyBroadCastReceiver
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -60,7 +61,11 @@ class LocationTrackingService: LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         stopSelf()
-        unregisterReceiver(myBroadcastReceiver)
+        try {
+            unregisterReceiver(myBroadcastReceiver)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @SuppressLint("MissingPermission")
