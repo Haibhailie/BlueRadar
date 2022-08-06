@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -14,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -24,6 +22,8 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
 import ca.sfu.BlueRadar.ui.menu.SettingsActivity
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: BottomNavigationView
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var locationTrackingServiceIntent: Intent
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +49,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
         checkPermissions()
-        startLocationTrackingService()
     }
 
     override fun onRestart() {
@@ -154,16 +152,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startLocationTrackingService() {
-        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
-        this.startService(locationTrackingServiceIntent)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        val intent = Intent()
-        intent.action = LocationTrackingService.STOP_TRACKING_SERVICE
-        sendBroadcast(intent)
+        val locationIntent = Intent()
+        locationIntent.action = LocationTrackingService.STOP_TRACKING_SERVICE
+        sendBroadcast(locationIntent)
         LocationTrackingService.isTracking.value = false
+
+        val dbIntent = Intent()
+        dbIntent.action = DatabaseService.STOP_SERVICE_ACTION
+        sendBroadcast(dbIntent)
     }
 }

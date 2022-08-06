@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,133 +21,30 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
+import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
-import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
+import ca.sfu.BlueRadar.util.Util
 import com.google.android.gms.maps.model.LatLng
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
 class DevicesFragment : Fragment() {
 
+    //Global Variables
     private var _binding: FragmentDevicesBinding? = null
-    private var deviceNameList: ArrayList<String> = ArrayList()
+    private var viewDevices = 0
+    private val binding get() = _binding!!
+
+    //Global Lateinits
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    private var bluetoothDevices: ArrayList<String> = ArrayList()
-    private var deviceAddresses: ArrayList<String> = ArrayList()
-    private var viewDevices = 0
 
-    private val binding get() = _binding!!
-    private lateinit var database: DeviceDatabase
-    private lateinit var databaseDao: DeviceDatabaseDao
-    private lateinit var viewModelFactory: DeviceViewModelFactory
     private lateinit var deviceViewModel: DeviceViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
     private lateinit var buttonGroup: ThemedToggleButtonGroup
-
-    private val receiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-
-                    val device: BluetoothDevice? = intent.getParcelableExtra(
-                        BluetoothDevice
-                            .EXTRA_DEVICE
-                    )
-                    val temp = deviceViewModel.allEntriesLiveData.value
-                    var currentLoc = LatLng(0.0, 0.0)
-                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
-                        currentLoc = it
-                    }
-                    if (temp?.isNotEmpty() == true && device != null) {
-                        for (i in temp) {
-                            if (i.deviceName == device.name) {
-
-                                i.deviceConnected = true
-                                deviceViewModel.update(i)
-                                if (i.deviceTracking == true) {
-                                    i.deviceLastLocation = currentLoc
-                                }
-                                updateRecyclerView()
-                                // Testing - delete after
-                                val toast: Toast = Toast.makeText(
-                                    requireContext(),
-                                    "Current Loc: ${currentLoc.latitude}, ${currentLoc.longitude}",
-                                    Toast
-                                        .LENGTH_SHORT
-                                )
-                                toast.show()
-                            }
-                        }
-                    }
-                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
-                }
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    val g: ArrayList<LatLng?> = ArrayList()
-                    g.add(LocationTrackingService.currentPoint.value)
-                    val device: BluetoothDevice? = intent.getParcelableExtra(
-                        BluetoothDevice
-                            .EXTRA_DEVICE
-                    )
-                    val dbList = deviceViewModel.allEntriesLiveData.value
-                    var lastLoc = LatLng(0.0, 0.0)
-                    LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
-                        lastLoc = it
-                    }
-                    if (dbList?.isNotEmpty() == true && device != null) {
-                        for (i in dbList) {
-                            if (i.deviceName == device.name) {
-                                i.deviceConnected = false
-                                i.deviceLastLocation = lastLoc
-                                deviceViewModel.update(i)
-                                updateRecyclerView()
-                                val toast: Toast = Toast.makeText(
-                                    requireContext(),
-                                    "Last Loc: ${lastLoc.latitude}, ${lastLoc.longitude}",
-                                    Toast
-                                        .LENGTH_SHORT
-                                )
-                                toast.show()
-                            }
-                        }
-                    }
-                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
-                        Log.d("check me", i.toString())
-                    }
-                    Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
-
-                }
-                BluetoothDevice.ACTION_FOUND -> {
-                    // Discovery has found a device. Get the BluetoothDevice
-                    // object and its info from the Intent.
-                    val device: BluetoothDevice? =
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    val deviceName = device?.name
-                    val deviceHardwareAddress = device?.address // MAC address
-                    val rssi: String = intent.getShortExtra(
-                        BluetoothDevice.EXTRA_RSSI, Short
-                            .MIN_VALUE
-                    ).toString()
-                    if (!deviceAddresses.contains(deviceHardwareAddress)) {
-                        if (deviceHardwareAddress != null) {
-                            deviceAddresses.add(deviceHardwareAddress)
-                        }
-                        val deviceString = if (deviceName.isNullOrEmpty()) {
-                            "$deviceHardwareAddress RSSI $rssi dBm"
-                        } else {
-                            "$deviceName RSSI $rssi dBm"
-                        }
-                        bluetoothDevices.add(deviceString)
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,65 +58,11 @@ class DevicesFragment : Fragment() {
             )
         }
 
-        // Register for broadcasts when a device is discovered.
-        val filter = IntentFilter().apply {
-            addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
-            addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-            addAction(BluetoothDevice.ACTION_FOUND)
-            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-            addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-            addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
-        }
-        requireActivity().registerReceiver(receiver, filter)
-        firstBootSetup()
+        requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
+        deviceViewModel = BluetoothService.deviceViewModel
+
     }
 
-    private fun firstBootSetup() {
-        database = DeviceDatabase.getInstance(requireActivity())
-        databaseDao = database.deviceDatabaseDao
-        viewModelFactory = DeviceViewModelFactory(databaseDao)
-        deviceViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
-
-
-        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            deviceNameList.add(deviceName)
-            val btDevice = Device()
-            btDevice.deviceName = deviceName
-            btDevice.deviceType = device.type.toString()
-            btDevice.deviceMacAddress = device.address
-
-            var liveList = deviceViewModel.allEntriesLiveData.value
-            var isDuplicate = false
-
-            if (liveList != null) {
-                for (check in liveList) {
-                    if (check.deviceName == btDevice.deviceName)
-                        isDuplicate = true
-                }
-            }
-
-            if (!isDuplicate) {
-                deviceViewModel.insert(btDevice)
-            }
-
-            val deviceHardwareAddress = device.address // MAC Address
-            Log.d("bonded-device-name", btDevice.deviceName)
-            Log.d("bonded-device-address", deviceHardwareAddress)
-        }
-
-        // checking status
-        val toast: Toast
-        if (!bluetoothAdapter.isEnabled) {
-            Log.d("bluetooth-checker", "Bluetooth is Disabled")
-            toast = Toast.makeText(requireContext(), "Bluetooth is Disabled", Toast.LENGTH_SHORT)
-            toast.show()
-        }
-        bluetoothAdapter.startDiscovery()
-    }
 
     private fun setupButtonGroupListener() {
         buttonGroup.selectButton(binding.allDeviceButton)
@@ -334,8 +176,7 @@ class DevicesFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-        //deviceViewModel.deleteAll()
-        requireActivity().unregisterReceiver(receiver)
+
     }
 
     class MarginItemDecoration(private val spaceSize: Int) : RecyclerView.ItemDecoration() {
