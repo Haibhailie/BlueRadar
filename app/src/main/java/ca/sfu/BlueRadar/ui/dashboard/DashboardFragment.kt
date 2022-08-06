@@ -64,11 +64,10 @@ class DashboardFragment : Fragment() {
         )!!
         bluetoothAdapter = bluetoothManager.adapter
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
-
+        setupRecyclerView()
         deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
             println("DEVICE: $it\n")
             if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
-                setupRecyclerView()
                 for (i in deviceViewModel.allEntriesLiveData.value!!) {
                     Log.d("check_from_dash", i.toString())
                 }
