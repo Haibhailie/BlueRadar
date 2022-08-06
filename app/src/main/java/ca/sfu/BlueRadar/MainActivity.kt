@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
@@ -15,6 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -25,12 +28,14 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
-import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
 import ca.sfu.BlueRadar.ui.menu.SettingsActivity
+import ca.sfu.BlueRadar.util.Util
 import com.google.android.material.navigation.NavigationView
+import de.hdodenhof.circleimageview.CircleImageView
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         println("debug: onStart called")
         setCustomTheme()
         super.onStart()
+        loadProfileInfo()
     }
 
     private fun setupBurgerMenuNavigation() {
@@ -112,6 +118,25 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             true
+        }
+    }
+    private fun loadProfileInfo() {
+        burgerView = findViewById(R.id.burger_view)
+        val headerView = burgerView.getHeaderView(0)
+        val profilePicture: CircleImageView = headerView.findViewById(R.id.profileImg)
+        val profileUsername: TextView = headerView.findViewById(R.id.username)
+        val profileEmail: TextView = headerView.findViewById(R.id.useremail)
+        val sharedPreferences: SharedPreferences = this.getSharedPreferences(getString(R.string
+            .profile_pref_name), Context.MODE_PRIVATE)
+        profileUsername.text = sharedPreferences.getString("name","").toString()
+        profileEmail.text = sharedPreferences.getString("email","").toString()
+        val tempImgFileName = "new_img.jpg"
+        val imgFile = File(getExternalFilesDir(null), tempImgFileName)
+        val tempImgUri:Uri = FileProvider.getUriForFile(this,"ca.sfu.BlueRadar", imgFile)
+        if(imgFile.exists()) {
+            Log.d("exs_loadPhoto", "imgFile exists, loading previous image")
+            val bitmap = Util.getBitmap(this, tempImgUri)
+            profilePicture.setImageBitmap(bitmap)
         }
     }
 

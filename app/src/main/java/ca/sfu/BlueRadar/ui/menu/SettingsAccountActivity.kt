@@ -87,21 +87,13 @@ class SettingsAccountActivity : AppCompatActivity() {
         }
 
         val backButton : Button = findViewById(R.id.profileBackButton)
+        val saveButton : Button = findViewById(R.id.saveButton)
         backButton.setOnClickListener{
             onCancelButtonClicked()
         }
-    }
-
-    /**
-     * Creates the Dialog fragment for selecting photo upload option on-click of CHANGE button
-     */
-    fun onChangeButtonClicked(view: View) {
-        Log.d("exs_onChangePhoto", "in onChangePhotoClicked() and launching camera")
-        val myDialog = MyRunsDialogFragments()
-        val bundle = Bundle()
-        bundle.putInt(MyRunsDialogFragments.DIALOG_KEY, MyRunsDialogFragments.DIALOG_SELECT_PHOTO)
-        myDialog.arguments = bundle
-        myDialog.show(supportFragmentManager, "my dialog")
+        saveButton.setOnClickListener() {
+            onSaveButtonClicked()
+        }
     }
 
     /**
@@ -131,7 +123,7 @@ class SettingsAccountActivity : AppCompatActivity() {
     /**
      * On-click of the "SAVE" button, saves all user data, delete previous image file, finish activity.
      */
-    fun onSaveButtonClicked(view: View) {
+    private fun onSaveButtonClicked() {
         Log.d("exs_onSaveButton", "in onSaveButtonClicked()")
         saveProfile()
         saveStatus = true
@@ -217,7 +209,6 @@ class SettingsAccountActivity : AppCompatActivity() {
     private fun saveProfile() {
         Log.d("exs_saveProfile", "in saveProfile()")
         sharedPreferences = this.getSharedPreferences(getString(R.string.profile_pref_name), Context.MODE_PRIVATE) ?: return
-
         dataName = findViewById(R.id.nameField)
         dataEmail = findViewById(R.id.emailField)
         dataPhone = findViewById(R.id.phoneField)
@@ -233,8 +224,7 @@ class SettingsAccountActivity : AppCompatActivity() {
         }
         val arrFields = arrayOf(dataName,dataEmail,dataPhone)
 
-        if((imageView.drawable == null) or (sharedPreferences.getInt("gender",-1)==-1)
-            or hasEmptyFields(arrFields)) containsEmptyFields = true
+        if((imageView.drawable == null) or hasEmptyFields(arrFields)) containsEmptyFields = true
 
         // myViewModel is adapted from class code of Lecture 3: Using the Camera and Data Storage.
         myViewModel = ViewModelProvider(this)[ProfilePhotoViewModel::class.java]
