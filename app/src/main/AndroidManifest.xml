@@ -44,6 +44,15 @@
         android:theme="@style/MyAppTheme"
         tools:targetApi="31">
         <activity
+            android:name="ca.sfu.BlueRadar.util.SplashScreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="ca.sfu.BlueRadar.about.AboutApplication"
             android:exported="false" />
         <activity
@@ -67,9 +76,7 @@
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationTrackingService" />
-
         <service android:name=".services.DatabaseService" />
-
         <service android:name=".services.BluetoothService" />
 
         <activity

@@ -63,11 +63,6 @@ class DevicesFragment : Fragment() {
     }
 
     private fun firstBootSetup() {
-        BluetoothService.deviceViewModel = ViewModelProvider(
-            requireActivity(),
-            DatabaseService.viewModelFactory
-        )[DeviceViewModel::class.java]
-
         deviceViewModel = BluetoothService.deviceViewModel
     }
 

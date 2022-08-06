@@ -10,13 +10,14 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.gms.maps.model.LatLng
 import kotlin.collections.ArrayList
 
 
-class BluetoothService : Service() {
+class BluetoothService() : Service() {
 
     companion object {
         val STOP_SERVICE_ACTION = "stop service action"
@@ -88,6 +89,7 @@ class BluetoothService : Service() {
 
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
+
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
 
                     //Check if any paired bluetooth devices are available

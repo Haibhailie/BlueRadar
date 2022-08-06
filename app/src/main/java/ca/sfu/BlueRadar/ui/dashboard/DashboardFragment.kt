@@ -55,11 +55,8 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        database = DeviceDatabase.getInstance(requireActivity())
-        databaseDao = database.deviceDatabaseDao
-        viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+            BluetoothService.deviceViewModel
 
         bluetoothManager = ContextCompat.getSystemService(
             requireContext(),

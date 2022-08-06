@@ -38,9 +38,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: BottomNavigationView
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var locationTrackingServiceIntent: Intent
-    private lateinit var databaseService: Intent
-    private lateinit var bluetoothService: Intent
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +49,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        startLocationTrackingService()
-        startDatabaseService()
-        startBluetoothService()
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
         checkPermissions()
@@ -155,21 +150,6 @@ class MainActivity : AppCompatActivity() {
                 0
             )
         }
-    }
-
-    private fun startLocationTrackingService() {
-        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
-        this.startService(locationTrackingServiceIntent)
-    }
-
-    private fun startDatabaseService(){
-        databaseService = Intent(this, DatabaseService::class.java)
-        this.startService(databaseService)
-    }
-
-    private fun startBluetoothService(){
-        bluetoothService = Intent(this, BluetoothService::class.java)
-        this.startService(bluetoothService)
     }
 
     override fun onDestroy() {
