@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,40 +21,40 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
+import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
-import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import com.google.android.gms.maps.model.LatLng
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
 class DevicesFragment : Fragment() {
 
+    //Global Variables
     private var _binding: FragmentDevicesBinding? = null
     private var deviceNameList: ArrayList<String> = ArrayList()
-    private lateinit var bluetoothManager: BluetoothManager
-    private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothDevices: ArrayList<String> = ArrayList()
     private var deviceAddresses: ArrayList<String> = ArrayList()
     private var viewDevices = 0
-
     private val binding get() = _binding!!
-    private lateinit var database: DeviceDatabase
-    private lateinit var databaseDao: DeviceDatabaseDao
-    private lateinit var viewModelFactory: DeviceViewModelFactory
+
+    //Global Lateinits
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothAdapter: BluetoothAdapter
+
     private lateinit var deviceViewModel: DeviceViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
     private lateinit var buttonGroup: ThemedToggleButtonGroup
 
+    //Bluetooth broadcast receiver
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
 
+                    //Check if any paired bluetooth devices are available
                     val device: BluetoothDevice? = intent.getParcelableExtra(
                         BluetoothDevice
                             .EXTRA_DEVICE
@@ -65,6 +64,8 @@ class DevicesFragment : Fragment() {
                     LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
                         currentLoc = it
                     }
+
+                    //Save device to database on connect if not already available (new device sync)
                     if (temp?.isNotEmpty() == true && device != null) {
                         for (i in temp) {
                             if (i.deviceName == device.name) {
@@ -75,7 +76,6 @@ class DevicesFragment : Fragment() {
                                     i.deviceLastLocation = currentLoc
                                 }
                                 updateRecyclerView()
-                                // Testing - delete after
                                 val toast: Toast = Toast.makeText(
                                     requireContext(),
                                     "Current Loc: ${currentLoc.latitude}, ${currentLoc.longitude}",
@@ -88,6 +88,8 @@ class DevicesFragment : Fragment() {
                     }
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} connected")
                 }
+
+                //Save latlng upon disconnect and update status
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
                     val g: ArrayList<LatLng?> = ArrayList()
                     g.add(LocationTrackingService.currentPoint.value)
@@ -123,6 +125,8 @@ class DevicesFragment : Fragment() {
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
 
                 }
+
+                //Add device to arrayList
                 BluetoothDevice.ACTION_FOUND -> {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
@@ -177,12 +181,8 @@ class DevicesFragment : Fragment() {
     }
 
     private fun firstBootSetup() {
-        database = DeviceDatabase.getInstance(requireActivity())
-        databaseDao = database.deviceDatabaseDao
-        viewModelFactory = DeviceViewModelFactory(databaseDao)
         deviceViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
-
+            ViewModelProvider(requireActivity(), DatabaseService.viewModelFactory)[DeviceViewModel::class.java]
 
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
         pairedDevices?.forEach { device ->

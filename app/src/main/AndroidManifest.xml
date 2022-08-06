@@ -67,11 +67,16 @@
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationTrackingService" />
-        <activity android:name=".ui.menu.SettingsActivity"
-            android:parentActivityName=".MainActivity"/>
+
+        <service android:name=".services.DatabaseService" />
+
+        <activity
+            android:name=".ui.menu.SettingsActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ui.menu.OptionsActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
+
         <service
             android:name=".services.NotificationService"
             android:enabled="true" />
