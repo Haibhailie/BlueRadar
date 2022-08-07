@@ -1,5 +1,7 @@
 package ca.sfu.BlueRadar.ui.dashboard
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -8,24 +10,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
+import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
-import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import ca.sfu.BlueRadar.util.Util
 
 class DashboardFragment : Fragment() {
-//    private lateinit var database: DeviceDatabase
-//    private lateinit var databaseDao: DeviceDatabaseDao
-//    private lateinit var viewModelFactory: DeviceViewModelFactory
-//    private lateinit var deviceViewModel: DeviceViewModel
+    private lateinit var database: DeviceDatabase
+    private lateinit var databaseDao: DeviceDatabaseDao
+    private lateinit var viewModelFactory: DeviceViewModelFactory
+    private lateinit var deviceViewModel: DeviceViewModel
+
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothAdapter: BluetoothAdapter
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
@@ -47,60 +55,58 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        database = DeviceDatabase.getInstance(requireActivity())
-//        databaseDao = database.deviceDatabaseDao
-//        viewModelFactory = DeviceViewModelFactory(databaseDao)
-//        deviceViewModel =
-//            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+        deviceViewModel =
+            BluetoothService.deviceViewModel
 
-//        Database.getAllEntries().observe(viewLifecycleOwner) {
-//            println("DEVICE: $it\n")
-//            if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
-//                setupRecyclerView()
-//                for (i in deviceViewModel.allEntriesLiveData.value!!) {
-//                    Log.d("check_from_dash", i.toString())
-//                }
-//            } else {
-//                val textView: TextView = binding.dashboardTitle
-//                dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
-//                    textView.text = g
-//                    textView.setTextColor(Color.GRAY)
-//                }
-//            }
-//        }
-        if (Database.getAllEntries().isNullOrEmpty()) {
-            setupRecyclerView()
-            for (i in Database.getAllEntries()) {
-                Log.d("check_from_dash", i.toString())
-            }
-        } else {
-            val textView: TextView = binding.dashboardTitle
-            dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
-                textView.text = g
-                textView.setTextColor(Color.GRAY)
+        bluetoothManager = ContextCompat.getSystemService(
+            requireContext(),
+            BluetoothManager::class.java
+        )!!
+        bluetoothAdapter = bluetoothManager.adapter
+        requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
+        setupRecyclerView()
+        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+            println("DEVICE: $it\n")
+            if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
+                for (i in deviceViewModel.allEntriesLiveData.value!!) {
+                    Log.d("check_from_dash", i.toString())
+                }
+            } else {
+                val textView: TextView = binding.dashboardTitle
+                dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+                    textView.text = g
+                    textView.setTextColor(Color.GRAY)
+                }
             }
         }
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (this::recyclerAdapter.isInitialized) {
+            recyclerAdapter.notifyDataSetChanged()
+        }
     }
 
     fun setupRecyclerView() {
         recyclerView = binding.devicesRecyclerDashboard
         recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
         arrayList = ArrayList()
-        recyclerAdapter =
-            DashboardRecyclerAdapter(requireActivity(), arrayList)
-        recyclerView.adapter = recyclerAdapter
-        recyclerView.layoutManager = GridLayoutManager(requireActivity(), 1)
-        arrayList = ArrayList()
-        recyclerAdapter =
-            DashboardRecyclerAdapter(requireActivity(), arrayList)
-        Util.removeDuplicates(arrayList)
-        recyclerAdapter.replace(Database.getAllEntries())
-        recyclerAdapter.notifyDataSetChanged()
-        recyclerView.adapter = recyclerAdapter
 
+        recyclerAdapter =
+            DashboardRecyclerAdapter(
+                requireActivity(), arrayList, deviceViewModel
+            )
+
+        deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+            recyclerAdapter.replace(it)
+            recyclerAdapter.notifyDataSetChanged()
+        }
+
+        recyclerView.adapter = recyclerAdapter
         recyclerView.addItemDecoration(
-            MarginItemDecoration(25)
+            DevicesFragment.MarginItemDecoration(25)
         )
     }
 
@@ -109,20 +115,4 @@ class DashboardFragment : Fragment() {
         _binding = null
     }
 
-    class MarginItemDecoration(private val spaceSize: Int) : RecyclerView.ItemDecoration() {
-        override fun getItemOffsets(
-            outRect: Rect, view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            with(outRect) {
-                if (parent.getChildAdapterPosition(view) == 0) {
-                    top = spaceSize
-                }
-                left = spaceSize
-                right = spaceSize
-                bottom = spaceSize
-            }
-        }
-    }
 }

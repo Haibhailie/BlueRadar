@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ca.sfu.BlueRadar"
     tools:ignore="CoarseFineLocation">
+
     <!-- Request legacy Bluetooth permissions on older devices. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
@@ -32,6 +33,13 @@
         tools:ignore="CoarseFineLocation" />
 
     <uses-feature android:name="android.software.companion_device_setup" />
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="false"
@@ -43,14 +51,29 @@
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.actions"
+            android:resource="@xml/file_paths" />
+
         <activity
-            android:name="ca.sfu.BlueRadar.about.AboutApplication"
+            android:name=".util.SplashScreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".about.AboutApplication"
             android:exported="false" />
+
         <activity
-            android:name="ca.sfu.BlueRadar.about.AboutDevelopers"
+            android:name=".about.AboutDevelopers"
             android:exported="false" />
+
         <activity
-            android:name="ca.sfu.BlueRadar.navigation.NavigationActivity"
+            android:name=".navigation.NavigationActivity"
             android:exported="false"
             android:label="@string/title_activity_navigation"
             android:theme="@style/MyAppTheme.NoActionBar" />
@@ -62,16 +85,31 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationTrackingService" />
-        <activity android:name=".ui.menu.SettingsActivity"
-            android:parentActivityName=".MainActivity"/>
+        <service android:name=".services.DatabaseService" />
+        <service android:name=".services.BluetoothService" />
+
+        <activity
+            android:name=".ui.menu.SettingsActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ui.menu.OptionsActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ui.menu.SettingsAccountActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=".ui.menu.SettingsAccountActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".services.NotificationService"
             android:enabled="true" />
@@ -79,12 +117,17 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="ca.sfu.BlueRadar"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

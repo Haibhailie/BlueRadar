@@ -36,17 +36,17 @@
         <item>Red</item>
         <item>Orange</item>
         <item>Blue</item>
-<!--        <item>Yellow</item>-->
-<!--        <item>Green</item>-->
-<!--        <item>Purple</item>-->
+        <!--        <item>Yellow</item>-->
+        <!--        <item>Green</item>-->
+        <!--        <item>Purple</item>-->
     </string-array>
     <string-array name="options_values">
         <item>AppThemeRed</item>
         <item>AppTheme</item>
         <item>AppThemeBlue</item>
-<!--        <item>AppThemeYellow</item>-->
-<!--        <item>AppThemeGreen</item>-->
-<!--        <item>AppThemePurple</item>-->
+        <!--        <item>AppThemeYellow</item>-->
+        <!--        <item>AppThemeGreen</item>-->
+        <!--        <item>AppThemePurple</item>-->
     </string-array>
     <string name="about">About</string>
     <string name="about_the_developers">About The Developers</string>
@@ -63,4 +63,10 @@
 
     <!-- Navigation Activity -->
     <string name="open_gm_button">Open in Google Maps</string>
+
+    <string-array name="profile_photo_selections">
+        <item><br />Capture an Image</item>
+        <item><br />Choose from Gallery</item>
+    </string-array>
+    <string name="profile_pref_name">PROFILE_PREFERENCE</string>
 </resources>
