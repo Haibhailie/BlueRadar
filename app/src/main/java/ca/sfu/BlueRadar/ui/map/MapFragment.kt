@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.databinding.FragmentNotificationsBinding
+import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
@@ -63,11 +64,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         // Initialize the database
-        database = DeviceDatabase.getInstance(requireActivity())
-        databaseDao = database.deviceDatabaseDao
-        viewModelFactory = DeviceViewModelFactory(databaseDao)
-        deviceViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+        deviceViewModel = BluetoothService.deviceViewModel
         devicesList = ArrayList()
 
         // Initialize the Map Setting button
@@ -92,7 +89,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         markerOptions = MarkerOptions()
 
         val devicesList = deviceViewModel.allEntriesLiveData.value
-        if (devicesList?.size == 0) {
+        if (devicesList == null || devicesList?.size == 0) {
             Toast.makeText(requireContext(), "No device is being connected", Toast.LENGTH_SHORT).show()
 
         } else {

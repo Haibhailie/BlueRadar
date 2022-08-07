@@ -70,7 +70,7 @@ class DevicesFragment : Fragment() {
 
         when (viewDevices) {
             0 -> {
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -78,7 +78,7 @@ class DevicesFragment : Fragment() {
             }
             1 -> {
                 //Change this once Mongo Migration is complete
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -86,7 +86,7 @@ class DevicesFragment : Fragment() {
             }
             else -> {
                 //Change this once Mongo Migration is complete
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -104,7 +104,7 @@ class DevicesFragment : Fragment() {
 
         when (viewDevices) {
             0 -> {
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -112,7 +112,7 @@ class DevicesFragment : Fragment() {
             }
             1 -> {
                 //Change this once Mongo Migration is complete
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
@@ -120,7 +120,7 @@ class DevicesFragment : Fragment() {
             }
             else -> {
                 //Change this once Mongo Migration is complete
-                //requireActivity().viewModelStore.clear()
+                requireActivity().viewModelStore.clear()
                 deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
                     recyclerAdapter.replace(it)
                     recyclerAdapter.notifyDataSetChanged()
