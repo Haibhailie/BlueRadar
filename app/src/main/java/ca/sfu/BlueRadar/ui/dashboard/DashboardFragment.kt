@@ -19,18 +19,18 @@ import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
 import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
-import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
+import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
+//import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import ca.sfu.BlueRadar.util.Util
 
 class DashboardFragment : Fragment() {
-    private lateinit var database: DeviceDatabase
-    private lateinit var databaseDao: DeviceDatabaseDao
-    private lateinit var viewModelFactory: DeviceViewModelFactory
-    private lateinit var deviceViewModel: DeviceViewModel
+//    private lateinit var database: DeviceDatabase
+//    private lateinit var databaseDao: DeviceDatabaseDao
+//    private lateinit var viewModelFactory: DeviceViewModelFactory
+//    private lateinit var deviceViewModel: DeviceViewModel
 
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -55,8 +55,8 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        deviceViewModel =
-            BluetoothService.deviceViewModel
+//        deviceViewModel =
+//            BluetoothService.deviceViewModel
 
         bluetoothManager = ContextCompat.getSystemService(
             requireContext(),
@@ -65,20 +65,34 @@ class DashboardFragment : Fragment() {
         bluetoothAdapter = bluetoothManager.adapter
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
         setupRecyclerView()
-        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-            println("DEVICE: $it\n")
-            if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
-                for (i in deviceViewModel.allEntriesLiveData.value!!) {
-                    Log.d("check_from_dash", i.toString())
-                }
-            } else {
-                val textView: TextView = binding.dashboardTitle
-                dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
-                    textView.text = g
-                    textView.setTextColor(Color.GRAY)
-                }
+//        deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//            println("DEVICE: $it\n")
+//            if (!deviceViewModel.allEntriesLiveData.value.isNullOrEmpty()) {
+//                for (i in deviceViewModel.allEntriesLiveData.value!!) {
+//                    Log.d("check_from_dash", i.toString())
+//                }
+//            } else {
+//                val textView: TextView = binding.dashboardTitle
+//                dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+//                    textView.text = g
+//                    textView.setTextColor(Color.GRAY)
+//                }
+//            }
+//        }
+
+        val devicesList = Database.getAllEntries()
+        if (devicesList.isNullOrEmpty()) {
+            for (i in devicesList) {
+                Log.d("check_from_dash", i.toString())
+            }
+        } else {
+            val textView: TextView = binding.dashboardTitle
+            dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+                textView.text = g
+                textView.setTextColor(Color.GRAY)
             }
         }
+
         return root
     }
 
@@ -96,13 +110,15 @@ class DashboardFragment : Fragment() {
 
         recyclerAdapter =
             DashboardRecyclerAdapter(
-                requireActivity(), arrayList, deviceViewModel
+                requireActivity(), arrayList
             )
 
-        deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
-            recyclerAdapter.replace(it)
-            recyclerAdapter.notifyDataSetChanged()
-        }
+//        deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+//            recyclerAdapter.replace(it)
+//            recyclerAdapter.notifyDataSetChanged()
+//        }
+        recyclerAdapter.replace(Database.getAllActiveEntries())
+        recyclerAdapter.notifyDataSetChanged()
 
         recyclerView.adapter = recyclerAdapter
         recyclerView.addItemDecoration(

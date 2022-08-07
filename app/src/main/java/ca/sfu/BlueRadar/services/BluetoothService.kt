@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.provider.ContactsContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.util.DisconnectNotification
 import com.google.android.gms.maps.model.LatLng
@@ -60,7 +62,8 @@ class BluetoothService() : Service() {
             btDevice.deviceType = device.type.toString()
             btDevice.deviceMacAddress = device.address
 
-            var liveList = deviceViewModel.allEntriesLiveData.value
+//            var liveList = deviceViewModel.allEntriesLiveData.value
+            var liveList = Database.getAllEntries()
             var isDuplicate = false
 
             if (liveList != null) {
@@ -71,8 +74,10 @@ class BluetoothService() : Service() {
             }
 
             if (!isDuplicate) {
-                deviceViewModel.insert(btDevice)
+//                deviceViewModel.insert(btDevice)
+                Database.insert(btDevice)
             }
+
         }
         bluetoothAdapter.startDiscovery()
     }
@@ -120,7 +125,7 @@ class BluetoothService() : Service() {
                         BluetoothDevice
                             .EXTRA_DEVICE
                     )
-                    val temp = deviceViewModel.allEntriesLiveData.value
+                    val temp = Database.getAllEntries()
                     var currentLoc = LatLng(0.0, 0.0)
 
                     LocationTrackingService.currentPoint.observeForever() {
@@ -133,7 +138,7 @@ class BluetoothService() : Service() {
                             if (i.deviceName == device.name) {
 
                                 i.deviceConnected = true
-                                deviceViewModel.update(i)
+                                Database.update(i)
                                 if (i.deviceTracking) {
                                     i.deviceLastLocation = currentLoc
                                 }
@@ -151,7 +156,7 @@ class BluetoothService() : Service() {
                         BluetoothDevice
                             .EXTRA_DEVICE
                     )
-                    val dbList = deviceViewModel.allEntriesLiveData.value
+                    val dbList = Database.getAllEntries()
                     var lastLoc = LatLng(0.0, 0.0)
                     LocationTrackingService.currentPoint.observeForever() {
                         lastLoc = it
@@ -161,12 +166,12 @@ class BluetoothService() : Service() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
-                                deviceViewModel.update(i)
+                                Database.update(i)
 
                             }
                         }
                     }
-                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
+                    for (i in Database.getAllEntries()) {
                         Log.d("check me", i.toString())
                     }
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")

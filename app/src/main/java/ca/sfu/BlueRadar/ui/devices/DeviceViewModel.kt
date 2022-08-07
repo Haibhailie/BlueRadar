@@ -53,11 +53,11 @@ class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewMo
 //    }
 }
 
-class DeviceViewModelFactory(private val repository: DeviceDatabaseDao) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T { //create() creates a new instance of the modelClass, which is CommentViewModel in this case.
-        if (modelClass.isAssignableFrom(DeviceViewModel::class.java))
-            return DeviceViewModel(repository) as T
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+//class DeviceViewModelFactory(private val repository: DeviceDatabaseDao) :
+//    ViewModelProvider.Factory {
+//    override fun <T : ViewModel> create(modelClass: Class<T>): T { //create() creates a new instance of the modelClass, which is CommentViewModel in this case.
+//        if (modelClass.isAssignableFrom(DeviceViewModel::class.java))
+//            return DeviceViewModel(repository) as T
+//        throw IllegalArgumentException("Unknown ViewModel class")
+//    }
+//}

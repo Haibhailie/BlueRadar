@@ -24,6 +24,7 @@ import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
 import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.util.Util
 import com.google.android.gms.maps.model.LatLng
@@ -75,32 +76,38 @@ class DevicesFragment : Fragment() {
         arrayList = ArrayList()
         recyclerAdapter =
             DeviceRecyclerAdapter(
-                requireActivity(), arrayList, deviceViewModel
+                requireActivity(), arrayList
             )
 
         when (viewDevices) {
             0 -> {
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             1 -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             else -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
         }
 
@@ -115,26 +122,32 @@ class DevicesFragment : Fragment() {
         when (viewDevices) {
             0 -> {
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             1 -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             else -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
         }
         recyclerView.adapter = recyclerAdapter
