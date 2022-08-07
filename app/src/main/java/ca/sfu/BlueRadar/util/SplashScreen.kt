@@ -26,7 +26,6 @@ class SplashScreen : AppCompatActivity() {
 
     private lateinit var locationTrackingServiceIntent: Intent
     private lateinit var databaseService: Intent
-    private lateinit var bluetoothService: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         checkPermissions()
@@ -39,7 +38,7 @@ class SplashScreen : AppCompatActivity() {
         )
     }
 
-    private fun checkPermissions() {
+    fun checkPermissions() {
         if (Build.VERSION.SDK_INT < 29) return
         if ((ContextCompat.checkSelfPermission(
                 this,
@@ -58,11 +57,11 @@ class SplashScreen : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_SCAN
                 ),
                 0
             )
@@ -77,7 +76,7 @@ class SplashScreen : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             0 -> {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (verifyPermissions(permissions, grantResults)) {
                     Handler().postDelayed({
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
@@ -91,10 +90,35 @@ class SplashScreen : AppCompatActivity() {
         }
     }
 
+    fun verifyPermissions(
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ): Boolean {
+        var permCheck = true
+        var permIndex = 0
+        for (perm in permissions) {
+
+            println("Permissions: ${perm}")
+            println("GrantResults: ${grantResults[permIndex]}")
+
+            if (perm == Manifest.permission.BLUETOOTH_CONNECT
+                || perm == Manifest.permission.BLUETOOTH_SCAN
+                || perm == Manifest.permission.WRITE_EXTERNAL_STORAGE
+                || perm == Manifest.permission.CAMERA
+                || perm == Manifest.permission.ACCESS_FINE_LOCATION
+            ) {
+                if (grantResults[permIndex] != PackageManager.PERMISSION_GRANTED) {
+                    permCheck = false
+                }
+                permIndex++
+            }
+        }
+        return permCheck
+    }
+
     private fun setupServices() {
         startLocationTrackingService()
         startDatabaseService()
-        startBluetoothService()
     }
 
     private fun startLocationTrackingService() {
@@ -107,12 +131,4 @@ class SplashScreen : AppCompatActivity() {
         this.startService(databaseService)
     }
 
-    private fun startBluetoothService() {
-        BluetoothService.deviceViewModel = ViewModelProvider(
-            this,
-            DeviceViewModelFactory(DeviceDatabase.getInstance(this).deviceDatabaseDao)
-        )[DeviceViewModel::class.java]
-        bluetoothService = Intent(this, BluetoothService::class.java)
-        this.startService(bluetoothService)
-    }
 }

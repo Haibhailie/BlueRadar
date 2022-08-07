@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -28,8 +29,12 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
 import ca.sfu.BlueRadar.ui.menu.SettingsActivity
 import ca.sfu.BlueRadar.util.Util
@@ -47,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
+    private lateinit var bluetoothService: Intent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Set theme based on preferences
@@ -56,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        startBluetoothService()
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
     }
@@ -122,14 +130,18 @@ class MainActivity : AppCompatActivity() {
         val profilePicture: CircleImageView = headerView.findViewById(R.id.profileImg)
         val profileUsername: TextView = headerView.findViewById(R.id.username)
         val profileEmail: TextView = headerView.findViewById(R.id.useremail)
-        val sharedPreferences: SharedPreferences = this.getSharedPreferences(getString(R.string
-            .profile_pref_name), Context.MODE_PRIVATE)
-        profileUsername.text = sharedPreferences.getString("name","").toString()
-        profileEmail.text = sharedPreferences.getString("email","").toString()
+        val sharedPreferences: SharedPreferences = this.getSharedPreferences(
+            getString(
+                R.string
+                    .profile_pref_name
+            ), Context.MODE_PRIVATE
+        )
+        profileUsername.text = sharedPreferences.getString("name", "").toString()
+        profileEmail.text = sharedPreferences.getString("email", "").toString()
         val tempImgFileName = "new_img.jpg"
         val imgFile = File(getExternalFilesDir(null), tempImgFileName)
-        val tempImgUri:Uri = FileProvider.getUriForFile(this,"ca.sfu.BlueRadar", imgFile)
-        if(imgFile.exists()) {
+        val tempImgUri: Uri = FileProvider.getUriForFile(this, "ca.sfu.BlueRadar", imgFile)
+        if (imgFile.exists()) {
             Log.d("exs_loadPhoto", "imgFile exists, loading previous image")
             val bitmap = Util.getBitmap(this, tempImgUri)
             profilePicture.setImageBitmap(bitmap)
@@ -144,13 +156,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCustomTheme() {
-        val theme = PreferenceManager.getDefaultSharedPreferences(this).getString("options_colours", "AppTheme")
+        val theme = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("options_colours", "AppTheme")
         println("debug: theme name $theme")
         when (theme) {
             "AppTheme" -> setTheme(R.style.AppTheme)
             "AppThemeRed" -> setTheme(R.style.AppThemeRed)
             "AppThemeBlue" -> setTheme(R.style.AppThemeBlue)
         }
+    }
+
+    private fun startBluetoothService() {
+        BluetoothService.deviceViewModel = ViewModelProvider(
+            this,
+            DeviceViewModelFactory(DeviceDatabase.getInstance(this).deviceDatabaseDao)
+        )[DeviceViewModel::class.java]
+        bluetoothService = Intent(this, BluetoothService::class.java)
+        this.startService(bluetoothService)
     }
 
     override fun onDestroy() {
