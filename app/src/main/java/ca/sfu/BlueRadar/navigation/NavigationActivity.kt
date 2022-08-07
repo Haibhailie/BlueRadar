@@ -75,9 +75,8 @@ class NavigationActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
             val markerUserLocation = MarkerOptions().position(userPoint).title("You are here")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
             val markerDeviceLocation = MarkerOptions().position(deviceLastLocation!!)
-                .title("$deviceName")
+                .title("$deviceName").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
             mMap.addMarker(markerUserLocation)
             mMap.addMarker(markerDeviceLocation)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(deviceLastLocation!!, 17f))
