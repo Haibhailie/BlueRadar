@@ -1,13 +1,19 @@
 package ca.sfu.BlueRadar.ui.menu
 
+import android.app.AlertDialog
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceFragmentCompat
-import androidx.appcompat.widget.Toolbar
+import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
+import java.io.File
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -43,6 +49,11 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment: PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             addPreferencesFromResource(R.xml.preference_settings)
+            val cachePreference: Preference? = findPreference("preference_data")
+            cachePreference?.setOnPreferenceClickListener {
+                createDialog()
+                true
+            }
         }
 
         override fun onResume() {
@@ -59,6 +70,23 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 else -> super.onOptionsItemSelected(item)
             }
+        }
+
+        private fun createDialog() {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Clear Cache?")
+            builder.setPositiveButton("OK") { _, _ ->
+                File(requireContext().cacheDir.path).deleteRecursively()
+                File(requireActivity().externalCacheDir?.path).deleteRecursively()
+//                requireContext().cacheDir.deleteRecursively()
+//                requireActivity().externalCacheDir?.deleteRecursively()
+                Log.d("clearing_cache", "cleared")
+            }
+            builder.setNegativeButton("CANCEL") { dialog, _ ->
+                dialog.cancel()
+                Log.d("clearing_cache", "cancelled")
+            }
+            builder.show()
         }
     }
 
@@ -78,4 +106,6 @@ class SettingsActivity : AppCompatActivity() {
     public fun hideUpButton() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
+
+
 }

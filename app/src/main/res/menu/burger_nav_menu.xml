@@ -27,13 +27,5 @@
                 android:title="@string/about_the_developers" />
         </menu>
     </item>
-    <item android:title="@string/log_out">
-        <menu>
-            <item
-                android:id="@+id/burger_logout"
-                android:icon="@drawable/ic_baseline_logout"
-                android:title="@string/log_out" />
-        </menu>
-    </item>
 
 </menu>

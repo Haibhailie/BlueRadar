@@ -1,20 +1,25 @@
 package ca.sfu.BlueRadar
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
+import android.util.Log
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -24,10 +29,18 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
 import ca.sfu.BlueRadar.ui.menu.SettingsActivity
+import ca.sfu.BlueRadar.util.Util
 import com.google.android.material.navigation.NavigationView
+import de.hdodenhof.circleimageview.CircleImageView
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +51,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: BottomNavigationView
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var locationTrackingServiceIntent: Intent
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +63,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
-        checkPermissions()
-        startLocationTrackingService()
     }
 
     override fun onRestart() {
@@ -66,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         println("debug: onStart called")
         setCustomTheme()
         super.onStart()
+        loadProfileInfo()
     }
 
     private fun setupBurgerMenuNavigation() {
@@ -99,9 +111,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, OptionsActivity::class.java))
                 }
 
-                R.id.burger_logout ->
-                    Toast.makeText(applicationContext, "Logged Out", Toast.LENGTH_SHORT).show()
-
                 R.id.burger_about_devs -> {
                     startActivity(Intent(this, AboutDevelopers::class.java))
                 }
@@ -114,6 +123,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadProfileInfo() {
+        burgerView = findViewById(R.id.burger_view)
+        val headerView = burgerView.getHeaderView(0)
+        val profilePicture: CircleImageView = headerView.findViewById(R.id.profileImg)
+        val profileUsername: TextView = headerView.findViewById(R.id.username)
+        val profileEmail: TextView = headerView.findViewById(R.id.useremail)
+        val sharedPreferences: SharedPreferences = this.getSharedPreferences(
+            getString(
+                R.string
+                    .profile_pref_name
+            ), Context.MODE_PRIVATE
+        )
+        profileUsername.text = sharedPreferences.getString("name", "").toString()
+        profileEmail.text = sharedPreferences.getString("email", "").toString()
+        val tempImgFileName = "new_img.jpg"
+        val imgFile = File(getExternalFilesDir(null), tempImgFileName)
+        val tempImgUri: Uri = FileProvider.getUriForFile(this, "ca.sfu.BlueRadar", imgFile)
+        if (imgFile.exists()) {
+            Log.d("exs_loadPhoto", "imgFile exists, loading previous image")
+            val bitmap = Util.getBitmap(this, tempImgUri)
+            profilePicture.setImageBitmap(bitmap)
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (burgerToggle.onOptionsItemSelected(item)) {
             return true
@@ -122,7 +155,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCustomTheme() {
-        val theme = PreferenceManager.getDefaultSharedPreferences(this).getString("options_colours", "AppTheme")
+        val theme = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("options_colours", "AppTheme")
         println("debug: theme name $theme")
         when (theme) {
             "AppTheme" -> setTheme(R.style.AppTheme)
@@ -131,39 +165,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun checkPermissions() {
-        if (Build.VERSION.SDK_INT < 29) return
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-            != PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_SCAN
-                ),
-                0
-            )
-        }
-    }
-
-    private fun startLocationTrackingService() {
-        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
-        this.startService(locationTrackingServiceIntent)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        val intent = Intent()
-        intent.action = LocationTrackingService.STOP_TRACKING_SERVICE
-        sendBroadcast(intent)
+        val locationIntent = Intent()
+        locationIntent.action = LocationTrackingService.STOP_TRACKING_SERVICE
+        sendBroadcast(locationIntent)
         LocationTrackingService.isTracking.value = false
+
+        val dbIntent = Intent()
+        dbIntent.action = DatabaseService.STOP_SERVICE_ACTION
+        sendBroadcast(dbIntent)
     }
 }
