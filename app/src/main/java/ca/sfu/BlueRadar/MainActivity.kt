@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
-    private lateinit var bluetoothService: Intent
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        startBluetoothService()
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
     }
@@ -164,15 +163,6 @@ class MainActivity : AppCompatActivity() {
             "AppThemeRed" -> setTheme(R.style.AppThemeRed)
             "AppThemeBlue" -> setTheme(R.style.AppThemeBlue)
         }
-    }
-
-    private fun startBluetoothService() {
-        BluetoothService.deviceViewModel = ViewModelProvider(
-            this,
-            DeviceViewModelFactory(DeviceDatabase.getInstance(this).deviceDatabaseDao)
-        )[DeviceViewModel::class.java]
-        bluetoothService = Intent(this, BluetoothService::class.java)
-        this.startService(bluetoothService)
     }
 
     override fun onDestroy() {

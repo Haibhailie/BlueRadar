@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.BlueRadar.LoadingActivity
 import ca.sfu.BlueRadar.MainActivity
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.services.BluetoothService
@@ -24,12 +25,8 @@ import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 
 class SplashScreen : AppCompatActivity() {
 
-    private lateinit var locationTrackingServiceIntent: Intent
-    private lateinit var databaseService: Intent
-
     override fun onCreate(savedInstanceState: Bundle?) {
         checkPermissions()
-        setupServices()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
         window.setFlags(
@@ -78,7 +75,7 @@ class SplashScreen : AppCompatActivity() {
             0 -> {
                 if (verifyPermissions(permissions, grantResults)) {
                     Handler().postDelayed({
-                        val intent = Intent(this, MainActivity::class.java)
+                        val intent = Intent(this, LoadingActivity::class.java)
                         startActivity(intent)
                         finish()
                     }, 3000)
@@ -116,19 +113,5 @@ class SplashScreen : AppCompatActivity() {
         return permCheck
     }
 
-    private fun setupServices() {
-        startLocationTrackingService()
-        startDatabaseService()
-    }
-
-    private fun startLocationTrackingService() {
-        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
-        this.startService(locationTrackingServiceIntent)
-    }
-
-    private fun startDatabaseService() {
-        databaseService = Intent(this, DatabaseService::class.java)
-        this.startService(databaseService)
-    }
 
 }
