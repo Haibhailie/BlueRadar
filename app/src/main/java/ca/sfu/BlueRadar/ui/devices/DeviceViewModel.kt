@@ -17,41 +17,40 @@ import java.lang.IllegalArgumentException
  *
  */
 class DeviceViewModel(private val deviceDatabaseDao: DeviceDatabaseDao) : ViewModel() {
-    val allEntriesLiveData: LiveData<List<Device>> = deviceDatabaseDao.getAllEntries()
-        .asLiveData()
-
-    val activeEntriesLiveData: LiveData<List<Device>> =
-        deviceDatabaseDao.getAllActiveEntries(true).asLiveData()
-
-    val inactiveEntriesLiveData: LiveData<List<Device>> =
-        deviceDatabaseDao.getAllInactiveEntries(false).asLiveData()
-
-    fun insert(entry: Device) {
-        CoroutineScope(Dispatchers.IO).launch {
-            deviceDatabaseDao.insertEntry(entry)
-        }
-    }
-
-    fun delete(id: Long) {
-        if (allEntriesLiveData.value!!.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                deviceDatabaseDao.deleteEntry(id)
-            }
-        }
-    }
-
-    fun deleteAll() {
-        CoroutineScope(Dispatchers.IO).launch {
-            deviceDatabaseDao.deleteAll()
-        }
-    }
-
-    fun update(device: Device) {
-        CoroutineScope(Dispatchers.IO).launch {
-            deviceDatabaseDao.update(device)
-        }
-    }
-
+//    val allEntriesLiveData: LiveData<List<Device>> = deviceDatabaseDao.getAllEntries()
+//        .asLiveData()
+//
+//    val activeEntriesLiveData: LiveData<List<Device>> =
+//        deviceDatabaseDao.getAllActiveEntries(true).asLiveData()
+//
+//    val inactiveEntriesLiveData: LiveData<List<Device>> =
+//        deviceDatabaseDao.getAllInactiveEntries(false).asLiveData()
+//
+//    fun insert(entry: Device) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            deviceDatabaseDao.insertEntry(entry)
+//        }
+//    }
+//
+//    fun delete(id: Long) {
+//        if (allEntriesLiveData.value!!.isNotEmpty()) {
+//            CoroutineScope(Dispatchers.IO).launch {
+//                deviceDatabaseDao.deleteEntry(id)
+//            }
+//        }
+//    }
+//
+//    fun deleteAll() {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            deviceDatabaseDao.deleteAll()
+//        }
+//    }
+//
+//    fun update(device: Device) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            deviceDatabaseDao.update(device)
+//        }
+//    }
 }
 
 class DeviceViewModelFactory(private val repository: DeviceDatabaseDao) :

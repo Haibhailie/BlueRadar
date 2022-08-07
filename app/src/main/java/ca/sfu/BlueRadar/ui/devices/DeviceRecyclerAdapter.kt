@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.navigation.NavigationActivity
 import ca.sfu.BlueRadar.services.NotificationService
+import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class DeviceRecyclerAdapter(
     private val context: Context,
     private var deviceList: List<Device>,
-    private var deviceViewModel: DeviceViewModel,
 ) :
     RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>() {
 
@@ -33,6 +33,8 @@ class DeviceRecyclerAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val currItem = deviceList[position]
+        var tmp = Device(currItem.deviceType, currItem.deviceName, currItem.deviceTracking,
+            currItem.deviceLastLocation, currItem.deviceConnected, currItem.deviceMacAddress)
         //holder.imageView.setImageResource(ItemsViewModel.image)
         holder.deviceNameTextView.text = currItem.deviceName
         notificationIntent = Intent(context, NotificationService::class.java)
@@ -60,18 +62,18 @@ class DeviceRecyclerAdapter(
                 //Set the tracking to true here and update the database
                 holder.deviceIsTrackingTextView.text = "Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GREEN)
-                currItem.deviceTracking = true
-                deviceViewModel.update(currItem)
+                tmp.deviceTracking = true
+                Database.update(tmp)
 
                 context.startService(notificationIntent)
             } else {
                 //Set the tracking to false here and update the database
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
                 holder.deviceIsTrackingTextView.setTextColor(Color.GRAY)
-                currItem.deviceTracking = false
+                tmp.deviceTracking = false
 
                 var safeToClose = true
-                for (device in deviceViewModel.allEntriesLiveData.value!!) {
+                for (device in Database.getAllEntries()) {
                     if (device.deviceTracking == true)
                         safeToClose = false
                 }
@@ -82,7 +84,7 @@ class DeviceRecyclerAdapter(
 
                 }
 
-                deviceViewModel.update(currItem)
+                Database.update(tmp)
             }
         }
         holder.navButton.setOnClickListener {

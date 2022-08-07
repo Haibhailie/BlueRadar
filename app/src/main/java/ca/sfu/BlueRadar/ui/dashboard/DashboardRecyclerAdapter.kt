@@ -19,8 +19,7 @@ import java.text.DecimalFormat
 
 class DashboardRecyclerAdapter(
     private val context: Context,
-    private var deviceList: List<Device>,
-    private var deviceViewModel: DeviceViewModel
+    private var deviceList: List<Device>
 ) :
         RecyclerView.Adapter<DashboardRecyclerAdapter.ViewHolder>() {
 

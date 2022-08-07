@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.graphics.Rect
 import android.location.Location
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,9 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import ca.sfu.BlueRadar.services.NotificationService
-import ca.sfu.BlueRadar.ui.devices.data.Device
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
+import ca.sfu.BlueRadar.ui.devices.data.*
 import com.google.android.gms.maps.model.LatLng
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
 
@@ -41,10 +40,10 @@ class DevicesFragment : Fragment() {
     private var viewDevices = 0
 
     private val binding get() = _binding!!
-    private lateinit var database: DeviceDatabase
-    private lateinit var databaseDao: DeviceDatabaseDao
-    private lateinit var viewModelFactory: DeviceViewModelFactory
-    private lateinit var deviceViewModel: DeviceViewModel
+//    private lateinit var database: DeviceDatabase
+//    private lateinit var databaseDao: DeviceDatabaseDao
+//    private lateinit var viewModelFactory: DeviceViewModelFactory
+//    private lateinit var deviceViewModel: DeviceViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
@@ -60,7 +59,8 @@ class DevicesFragment : Fragment() {
                         BluetoothDevice
                             .EXTRA_DEVICE
                     )
-                    val temp = deviceViewModel.allEntriesLiveData.value
+//                    val temp = deviceViewModel.allEntriesLiveData.value
+                    val temp = Database.getAllEntries()
                     var currentLoc = LatLng(0.0, 0.0)
                     LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
                         currentLoc = it
@@ -70,7 +70,7 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
 
                                 i.deviceConnected = true
-                                deviceViewModel.update(i)
+                                Database.update(i)
                                 if (i.deviceTracking == true) {
                                     i.deviceLastLocation = currentLoc
                                 }
@@ -95,7 +95,8 @@ class DevicesFragment : Fragment() {
                         BluetoothDevice
                             .EXTRA_DEVICE
                     )
-                    val dbList = deviceViewModel.allEntriesLiveData.value
+//                    val dbList = deviceViewModel.allEntriesLiveData.value
+                    val dbList = Database.getAllEntries()
                     var lastLoc = LatLng(0.0, 0.0)
                     LocationTrackingService.currentPoint.observe(viewLifecycleOwner) {
                         lastLoc = it
@@ -105,7 +106,7 @@ class DevicesFragment : Fragment() {
                             if (i.deviceName == device.name) {
                                 i.deviceConnected = false
                                 i.deviceLastLocation = lastLoc
-                                deviceViewModel.update(i)
+                                Database.update(i)
                                 updateRecyclerView()
                                 val toast: Toast = Toast.makeText(
                                     requireContext(),
@@ -117,7 +118,10 @@ class DevicesFragment : Fragment() {
                             }
                         }
                     }
-                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
+//                    for (i in deviceViewModel.allEntriesLiveData.value!!) {
+//                        Log.d("check me", i.toString())
+//                    }
+                    for (i in Database.getAllEntries()) {
                         Log.d("check me", i.toString())
                     }
                     Log.d("BluetoothReceiver", "BluetoothDevice ${device?.name} disconnected")
@@ -177,11 +181,11 @@ class DevicesFragment : Fragment() {
     }
 
     private fun firstBootSetup() {
-        database = DeviceDatabase.getInstance(requireActivity())
-        databaseDao = database.deviceDatabaseDao
-        viewModelFactory = DeviceViewModelFactory(databaseDao)
-        deviceViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
+//        database = DeviceDatabase.getInstance(requireActivity())
+//        databaseDao = database.deviceDatabaseDao
+//        viewModelFactory = DeviceViewModelFactory(databaseDao)
+//        deviceViewModel =
+//            ViewModelProvider(requireActivity(), viewModelFactory)[DeviceViewModel::class.java]
 
 
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
@@ -193,7 +197,8 @@ class DevicesFragment : Fragment() {
             btDevice.deviceType = device.type.toString()
             btDevice.deviceMacAddress = device.address
 
-            var liveList = deviceViewModel.allEntriesLiveData.value
+//            var liveList = deviceViewModel.allEntriesLiveData.value
+            var liveList = Database.getAllEntries()
             var isDuplicate = false
 
             if (liveList != null) {
@@ -204,7 +209,7 @@ class DevicesFragment : Fragment() {
             }
 
             if (!isDuplicate) {
-                deviceViewModel.insert(btDevice)
+                Database.insert(btDevice)
             }
 
             val deviceHardwareAddress = device.address // MAC Address
@@ -252,32 +257,38 @@ class DevicesFragment : Fragment() {
         arrayList = ArrayList()
         recyclerAdapter =
             DeviceRecyclerAdapter(
-                requireActivity(), arrayList, deviceViewModel
+                requireActivity(), arrayList
             )
 
         when (viewDevices) {
             0 -> {
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             1 -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             else -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
         }
 
@@ -292,26 +303,32 @@ class DevicesFragment : Fragment() {
         when (viewDevices) {
             0 -> {
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             1 -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
             else -> {
                 //Change this once Mongo Migration is complete
                 requireActivity().viewModelStore.clear()
-                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
-                    recyclerAdapter.replace(it)
-                    recyclerAdapter.notifyDataSetChanged()
-                }
+                recyclerAdapter.replace(Database.getAllEntries())
+                recyclerAdapter.notifyDataSetChanged()
+//                deviceViewModel.allEntriesLiveData.observe(viewLifecycleOwner) {
+//                    recyclerAdapter.replace(it)
+//                    recyclerAdapter.notifyDataSetChanged()
+//                }
             }
         }
         recyclerView.adapter = recyclerAdapter
