@@ -46,6 +46,7 @@ class NotificationService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(myBroadcastReceiver)
         println("debug: onDestroy called")
     }
 

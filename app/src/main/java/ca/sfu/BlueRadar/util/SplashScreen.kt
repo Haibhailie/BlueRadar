@@ -5,13 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
-import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.MainActivity
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.services.BluetoothService
-import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
-import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 
 class SplashScreen : AppCompatActivity() {
 

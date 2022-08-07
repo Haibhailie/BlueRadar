@@ -1,6 +1,5 @@
 package ca.sfu.BlueRadar.services
 
-import android.app.NotificationManager
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -9,17 +8,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.provider.ContactsContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import ca.sfu.BlueRadar.R
-import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
-import ca.sfu.BlueRadar.util.DisconnectNotification
 import com.google.android.gms.maps.model.LatLng
 import kotlin.collections.ArrayList
 
@@ -28,7 +23,6 @@ class BluetoothService() : Service() {
 
     companion object {
         val STOP_SERVICE_ACTION = "stop service action"
-        lateinit var deviceViewModel: DeviceViewModel
         lateinit var bluetoothManager: BluetoothManager
         lateinit var bluetoothAdapter: BluetoothAdapter
         lateinit var receiver: BroadcastReceiver

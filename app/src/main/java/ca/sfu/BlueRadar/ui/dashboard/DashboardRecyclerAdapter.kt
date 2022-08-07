@@ -1,20 +1,16 @@
 package ca.sfu.BlueRadar.ui.dashboard
 
-import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.navigation.NavigationActivity
 import ca.sfu.BlueRadar.ui.devices.data.Device
-import com.google.android.material.switchmaterial.SwitchMaterial
-import org.w3c.dom.Text
 import java.text.DecimalFormat
 
 class DashboardRecyclerAdapter(

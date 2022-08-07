@@ -41,7 +41,6 @@ class DevicesFragment : Fragment() {
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
 
-    private lateinit var deviceViewModel: DeviceViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var arrayList: ArrayList<Device>
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
@@ -60,7 +59,6 @@ class DevicesFragment : Fragment() {
         }
 
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
-        deviceViewModel = BluetoothService.deviceViewModel
 
     }
 

@@ -3,7 +3,6 @@ package ca.sfu.BlueRadar.ui.dashboard
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,13 +16,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
 import ca.sfu.BlueRadar.services.BluetoothService
-import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
-import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
 import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 //import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
-import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import ca.sfu.BlueRadar.util.Util
 
 class DashboardFragment : Fragment() {
