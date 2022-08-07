@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Set theme based on preferences
@@ -116,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
+
     private fun loadProfileInfo() {
         burgerView = findViewById(R.id.burger_view)
         val headerView = burgerView.getHeaderView(0)
