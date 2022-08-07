@@ -24,7 +24,7 @@ class NotificationService: Service() {
     private lateinit var notificationManager: NotificationManager
 
     companion object {
-        val STOP_SERVICE_ACTION = "stop service action"
+        const val STOP_SERVICE_ACTION = "stop service action"
     }
 
     override fun onCreate() {
@@ -62,7 +62,7 @@ class NotificationService: Service() {
             PendingIntent.FLAG_MUTABLE
         )
 
-        var notificationBuilder = NotificationCompat.Builder(this, channelID)
+        val notificationBuilder = NotificationCompat.Builder(this, channelID)
             .setSmallIcon(R.drawable.blueradar_logo)
             .setContentTitle("BlueRadar")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
@@ -70,6 +70,7 @@ class NotificationService: Service() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT).setOngoing(true)
             .setContentIntent(contentIntent)
 
+        //Check notification preference boolean, if true(show notification) then keep true
         val notification = notificationBuilder.build()
 
         val notificationChannel =

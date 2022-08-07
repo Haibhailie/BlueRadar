@@ -21,6 +21,13 @@ import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 //import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.util.Util
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.notifications.UpdatedResults
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class DashboardFragment : Fragment() {
 //    private lateinit var database: DeviceDatabase
@@ -75,17 +82,35 @@ class DashboardFragment : Fragment() {
 //                }
 //            }
 //        }
+//        val devicesList = Database.getAllEntries()
+//        if (!devicesList.isNullOrEmpty()) {
+//            for (i in devicesList) {
+//                Log.d("check_from_dash", i.toString())
+//            }
+//        } else {
+//            val textView: TextView = binding.dashboardTitle
+//            dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+//                textView.text = g
+//                textView.setTextColor(Color.GRAY)
+//            }
+//        }
 
-        val devicesList = Database.getAllEntries()
-        if (devicesList.isNullOrEmpty()) {
-            for (i in devicesList) {
-                Log.d("check_from_dash", i.toString())
-            }
-        } else {
-            val textView: TextView = binding.dashboardTitle
-            dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
-                textView.text = g
-                textView.setTextColor(Color.GRAY)
+        val devicesList = Database.realm.query(Device::class)
+        CoroutineScope(Dispatchers.Main).launch {
+            val devicesFlow = devicesList.asFlow()
+            val devicesSubscription = devicesFlow.collect{ changes: ResultsChange<Device> ->
+                if(Database.getAllEntries().isNotEmpty()) {
+                    for (i in Database.getAllEntries()) {
+                        Log.d("check_from_dash", i.toString())
+                    }
+                }
+                else {
+                    val textView: TextView = binding.dashboardTitle
+                    dashboardViewModel.text.observe(viewLifecycleOwner) { g ->
+                        textView.text = g
+                        textView.setTextColor(Color.GRAY)
+                    }
+                }
             }
         }
 
@@ -113,8 +138,13 @@ class DashboardFragment : Fragment() {
 //            recyclerAdapter.replace(it)
 //            recyclerAdapter.notifyDataSetChanged()
 //        }
-        recyclerAdapter.replace(Database.getAllActiveEntries())
-        recyclerAdapter.notifyDataSetChanged()
+        val devicesList = Database.realm.query(Device::class)
+        CoroutineScope(Dispatchers.Main).launch {
+            devicesList.asFlow().collect{
+                recyclerAdapter.replace(Database.getAllActiveEntries())
+                recyclerAdapter.notifyDataSetChanged()
+            }
+        }
 
         recyclerView.adapter = recyclerAdapter
         recyclerView.addItemDecoration(

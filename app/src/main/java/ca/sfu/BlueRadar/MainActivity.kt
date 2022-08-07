@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkPermissions()
         //Set theme based on preferences
         setCustomTheme()
 
@@ -59,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
-        checkPermissions()
     }
 
     override fun onRestart() {

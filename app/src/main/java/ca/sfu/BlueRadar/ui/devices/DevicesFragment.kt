@@ -59,7 +59,9 @@ class DevicesFragment : Fragment() {
         }
 
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
-
+        for (i in Database.getAllEntries()){
+            println("debug: item at i ${i.deviceName}")
+        }
     }
 
     override fun onResume() {

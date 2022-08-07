@@ -16,6 +16,7 @@ import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.ui.devices.data.Database
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.gms.maps.model.LatLng
+import io.realm.kotlin.ext.query
 import kotlin.collections.ArrayList
 
 
@@ -57,7 +58,7 @@ class BluetoothService() : Service() {
             btDevice.deviceMacAddress = device.address
 
 //            var liveList = deviceViewModel.allEntriesLiveData.value
-            var liveList = Database.getAllEntries()
+            val liveList = Database.getAllEntries()
             var isDuplicate = false
 
             if (liveList != null) {
@@ -92,9 +93,9 @@ class BluetoothService() : Service() {
     }
 
     fun showDeviceDisconnectionNotification(deviceName: String) {
-        var textTitle = "BlueRadar Alert"
-        var textContent = "$deviceName has been disconnected."
-        var builder = NotificationCompat.Builder(this, channelID)
+        val textTitle = "BlueRadar Alert"
+        val textContent = "$deviceName has been disconnected."
+        val builder = NotificationCompat.Builder(this, channelID)
             .setSmallIcon(R.drawable.blueradar_logo)
             .setContentTitle(textTitle)
             .setContentText(textContent)
@@ -127,15 +128,19 @@ class BluetoothService() : Service() {
                     }
 
                     //Save device to database on connect if not already available (new device sync)
-                    if (temp?.isNotEmpty() == true && device != null) {
+                    if (temp.isNotEmpty() == true && device != null) {
                         for (i in temp) {
+                            val tmpDevice = Device(i.deviceType, i.deviceName, i.deviceTracking,
+                                i.deviceLastLocation, i.deviceConnected, i.deviceMacAddress)
                             if (i.deviceName == device.name) {
 
-                                i.deviceConnected = true
-                                Database.update(i)
+                                tmpDevice.deviceConnected = true
                                 if (i.deviceTracking) {
-                                    i.deviceLastLocation = currentLoc
+                                    tmpDevice.deviceLastLocation = currentLoc
                                 }
+
+                                //Update database entry with new data
+                                Database.update(tmpDevice)
                             }
                         }
                     }
@@ -157,11 +162,16 @@ class BluetoothService() : Service() {
                     }
                     if (dbList?.isNotEmpty() == true && device != null) {
                         for (i in dbList) {
+                            val tmpDevice = Device(i.deviceType, i.deviceName, i.deviceTracking,
+                                i.deviceLastLocation, i.deviceConnected, i.deviceMacAddress)
                             if (i.deviceName == device.name) {
-                                i.deviceConnected = false
-                                i.deviceLastLocation = lastLoc
-                                Database.update(i)
-
+                                tmpDevice.deviceConnected = false
+                                tmpDevice.deviceLastLocation = lastLoc
+                                Database.update(tmpDevice)
+                                // ISSUE #1 - Device location is either not updating to DB or not saving
+//                                println("debug: tmpDevice location: ${tmpDevice.deviceLastLocation}")
+//                                val dbent: List<Device> = Database.realm.query<Device>("deviceName == $0", i.deviceName).first()
+//                                println("debug: dbEntry location: ${dbent}")
                             }
                         }
                     }

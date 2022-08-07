@@ -73,11 +73,13 @@ object Database {
         CoroutineScope(Dispatchers.IO).launch {
             //Object is frozen and is safe to pass into the asynchronous transaction
             val name = device.deviceName
+            println("debug: name of device being updated $name")
             //Find the first device without tracking
             realm.query<Device>("deviceName == $0", name)
                 .first()
                 .find()
                 ?.also { deviceToBeUpdated ->
+                    println("debug: name of device in database ${deviceToBeUpdated.deviceName}")
                     realm.write {
                         findLatest(deviceToBeUpdated)?.deviceName = name
                         findLatest(deviceToBeUpdated)?.deviceConnected = device.deviceConnected
