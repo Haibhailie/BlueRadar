@@ -13,6 +13,7 @@
             android:title="Account Settings"
             android:summary=""
             app:iconSpaceReserved="false">
+            <intent android:action=".ui.menu.SettingsAccountActivity" />
         </Preference>
         <Preference
             android:key="preference_date"

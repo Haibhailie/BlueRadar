@@ -63,4 +63,10 @@
 
     <!-- Navigation Activity -->
     <string name="open_gm_button">Open in Google Maps</string>
+
+    <string-array name="profile_photo_selections">
+        <item><br />Capture an Image</item>
+        <item><br />Choose from Gallery</item>
+    </string-array>
+    <string name="profile_pref_name">PROFILE_PREFERENCE</string>
 </resources>
