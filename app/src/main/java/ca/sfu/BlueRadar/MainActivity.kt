@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -28,8 +29,12 @@ import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
+import ca.sfu.BlueRadar.services.BluetoothService
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
+import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.menu.OptionsActivity
 import ca.sfu.BlueRadar.ui.menu.SettingsActivity
 import ca.sfu.BlueRadar.util.Util
@@ -47,6 +52,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
+    private lateinit var locationTrackingServiceIntent: Intent
+    private lateinit var databaseService: Intent
+    private lateinit var bluetoothService: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,12 +68,13 @@ class MainActivity : AppCompatActivity() {
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
         checkPermissions()
+        setupServices()
     }
 
     override fun onRestart() {
+        super.onRestart()
         println("debug: onRestart called")
         setCustomTheme()
-        super.onResume()
     }
 
     override fun onStart() {
@@ -181,6 +190,32 @@ class MainActivity : AppCompatActivity() {
                 0
             )
         }
+    }
+
+    private fun setupServices() {
+        startLocationTrackingService()
+        startDatabaseService()
+        startBluetoothService()
+    }
+
+    private fun startLocationTrackingService() {
+        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
+        this.startService(locationTrackingServiceIntent)
+    }
+
+    private fun startDatabaseService() {
+        databaseService = Intent(this, DatabaseService::class.java)
+        this.startService(databaseService)
+    }
+
+    private fun startBluetoothService() {
+        BluetoothService.deviceViewModel = ViewModelProvider(
+            this,
+            DeviceViewModelFactory(DeviceDatabase.getInstance(this).deviceDatabaseDao)
+        )[DeviceViewModel::class.java]
+        bluetoothService = Intent(this, BluetoothService::class.java)
+        this.startService(bluetoothService)
+
     }
 
     override fun onDestroy() {

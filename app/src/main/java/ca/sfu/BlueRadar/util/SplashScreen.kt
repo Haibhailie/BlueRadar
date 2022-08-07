@@ -20,12 +20,8 @@ import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 @Suppress("DEPRECATION")
 class SplashScreen : AppCompatActivity() {
 
-    private lateinit var locationTrackingServiceIntent: Intent
-    private lateinit var databaseService: Intent
-    private lateinit var bluetoothService: Intent
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        setupServices()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
         window.setFlags(
@@ -38,32 +34,5 @@ class SplashScreen : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, 3000)
-
-    }
-
-    private fun setupServices() {
-        startLocationTrackingService()
-        startDatabaseService()
-        startBluetoothService()
-    }
-
-    private fun startLocationTrackingService() {
-        locationTrackingServiceIntent = Intent(this, LocationTrackingService::class.java)
-        this.startService(locationTrackingServiceIntent)
-    }
-
-    private fun startDatabaseService() {
-        databaseService = Intent(this, DatabaseService::class.java)
-        this.startService(databaseService)
-    }
-
-    private fun startBluetoothService() {
-        BluetoothService.deviceViewModel = ViewModelProvider(
-            this,
-            DeviceViewModelFactory(DeviceDatabase.getInstance(this).deviceDatabaseDao)
-        )[DeviceViewModel::class.java]
-        bluetoothService = Intent(this, BluetoothService::class.java)
-        this.startService(bluetoothService)
-
     }
 }
