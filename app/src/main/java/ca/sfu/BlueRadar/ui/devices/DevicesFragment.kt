@@ -64,24 +64,6 @@ class DevicesFragment : Fragment() {
     }
 
 
-    private fun setupButtonGroupListener() {
-        buttonGroup.selectButton(binding.allDeviceButton)
-        buttonGroup.setOnSelectListener {
-            viewDevices = when (it) {
-                binding.allDeviceButton -> {
-                    0
-                }
-                binding.activeDeviceButton -> {
-                    1
-                }
-                else -> {
-                    2
-                }
-            }
-            updateRecyclerView()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         updateRecyclerView()
@@ -167,9 +149,7 @@ class DevicesFragment : Fragment() {
 
         _binding = FragmentDevicesBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        buttonGroup = binding.deviceTrackingFilter
         setupRecyclerView()
-        setupButtonGroupListener()
         return root
     }
 
