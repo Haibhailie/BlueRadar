@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
 import java.text.SimpleDateFormat
@@ -70,13 +71,16 @@ class NotificationService: Service() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT).setOngoing(true)
             .setContentIntent(contentIntent)
 
-        val notification = notificationBuilder.build()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val checkBox = prefs.getBoolean("preference_notifications", true)
+        if(checkBox) {
+            val notification = notificationBuilder.build()
 
-        val notificationChannel =
-            NotificationChannel(channelID, "my_channel", NotificationManager.IMPORTANCE_DEFAULT)
-        notificationManager.createNotificationChannel(notificationChannel)
-        notificationManager.notify(notificationID, notification)
-
+            val notificationChannel =
+                NotificationChannel(channelID, "my_channel", NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(notificationChannel)
+            notificationManager.notify(notificationID, notification)
+        }
     }
 
     inner class MyBroadcastReceiver : BroadcastReceiver() {

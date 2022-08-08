@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.databinding.FragmentNotificationsBinding
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -87,6 +89,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         mMap.clear()
         markerOptions = MarkerOptions()
+        val prefs = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
+        val toggle = prefs?.getBoolean("options_map_dark_mode", true)
+        if(toggle == true) {
+            val mapStyleOptions = context?.let { MapStyleOptions.loadRawResourceStyle(it, R.raw.mapstyle_night) }
+            mMap.setMapStyle(mapStyleOptions)
+        }
 
         val devicesList = deviceViewModel.allEntriesLiveData.value
         if (devicesList == null || devicesList?.size == 0) {

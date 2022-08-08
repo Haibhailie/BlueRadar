@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.services.LocationTrackingService
 import com.android.volley.Request
@@ -20,10 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
 import org.json.JSONObject
 
@@ -73,6 +71,13 @@ class NavigationActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             mMap = googleMap
             mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+            val toggle = prefs.getBoolean("options_map_dark_mode", true)
+            if(toggle) {
+                val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_night)
+                mMap.setMapStyle(mapStyleOptions)
+            }
 
             val markerUserLocation = MarkerOptions().position(userPoint).title("You are here")
             val markerDeviceLocation = MarkerOptions().position(deviceLastLocation!!)
