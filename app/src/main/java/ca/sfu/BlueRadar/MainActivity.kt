@@ -68,13 +68,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        println("debug: onRestart called")
         setCustomTheme()
         super.onResume()
     }
 
     override fun onStart() {
-        println("debug: onStart called")
         setCustomTheme()
         super.onStart()
         loadProfileInfo()
@@ -157,7 +155,6 @@ class MainActivity : AppCompatActivity() {
     private fun setCustomTheme() {
         val theme = PreferenceManager.getDefaultSharedPreferences(this)
             .getString("options_colours", "AppTheme")
-        println("debug: theme name $theme")
         when (theme) {
             "AppTheme" -> setTheme(R.style.AppTheme)
             "AppThemeRed" -> setTheme(R.style.AppThemeRed)
