@@ -1,6 +1,8 @@
 package ca.sfu.BlueRadar.ui.menu
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
@@ -8,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
-import kotlin.system.exitProcess
 
 
 class OptionsActivity : AppCompatActivity() {
@@ -53,9 +54,14 @@ class OptionsActivity : AppCompatActivity() {
                     AlertDialog.Builder(context)
                         .setTitle("Change Theme")
                         .setMessage("An app restart is required to properly apply the theme. Restart now or later?")
-                        .setPositiveButton("now") { dialog, which ->
+                        .setPositiveButton("now") { _, _ ->
                             // exitProcess restarts the application
-                            exitProcess(0)
+                            val ctx: Context? = context
+                            val pm = ctx?.packageManager
+                            val intent = pm?.getLaunchIntentForPackage(ctx.packageName)
+                            val mainIntent = Intent.makeRestartActivityTask(intent!!.component)
+                            ctx.startActivity(mainIntent)
+                            Runtime.getRuntime().exit(0)
                         }
                         .setNegativeButton("later", null)
                         //No listener needed for negative button
