@@ -41,7 +41,7 @@ class DeviceRecyclerAdapter(
         val currItem = deviceList[position]
         //holder.imageView.setImageResource(ItemsViewModel.image)
         holder.deviceNameTextView.text = currItem.deviceName
-        notificationIntent = Intent(context, NotificationService::class.java)
+//        notificationIntent = Intent(context, NotificationService::class.java)
 
         if (currItem.deviceTracking) {
             holder.deviceIsTrackingTextView.text = "Tracking"
@@ -70,7 +70,7 @@ class DeviceRecyclerAdapter(
                 currItem.deviceTracking = true
                 deviceViewModel.update(currItem)
 
-                context.startService(notificationIntent)
+//                context.startService(notificationIntent)
             } else {
                 //Set the tracking to false here and update the database
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
@@ -84,8 +84,8 @@ class DeviceRecyclerAdapter(
                 }
                 if (safeToClose) {
                     val intent = Intent()
-                    intent.action = NotificationService.STOP_SERVICE_ACTION
-                    context.sendBroadcast(intent)
+//                    intent.action = NotificationService.STOP_SERVICE_ACTION
+//                    context.sendBroadcast(intent)
 
                 }
 

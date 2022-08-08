@@ -8,8 +8,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -30,8 +32,10 @@ import ca.sfu.BlueRadar.about.AboutApplication
 import ca.sfu.BlueRadar.about.AboutDevelopers
 import ca.sfu.BlueRadar.databinding.ActivityMainBinding
 import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.BluetoothService.Companion.deviceViewModel
 import ca.sfu.BlueRadar.services.DatabaseService
 import ca.sfu.BlueRadar.services.LocationTrackingService
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
@@ -52,19 +56,54 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
-
+    private lateinit var notificationIntent: Intent
+    private lateinit var preferences: SharedPreferences
+    private var check: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Set theme based on preferences
         setCustomTheme()
 
+        setupPreferencesListener()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setupBurgerMenuContents()
         setupBurgerMenuNavigation()
+    }
+
+    private fun setupPreferencesListener(){
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            when (key){
+                "preference_notifications" -> {
+                    val prefs = this.let { PreferenceManager.getDefaultSharedPreferences(it) }
+                    val checkBox = prefs?.getBoolean("preference_notifications", true)
+                    if (checkBox != null) {
+                        check = checkBox
+                    }
+                    if(checkBox == true){
+                        deviceViewModel.activeEntriesLiveData.observe(this) {
+                            if (!deviceViewModel.activeEntriesLiveData.value.isNullOrEmpty()) {
+                                notificationIntent = Intent(this, NotificationService::class.java)
+                                this.startService(notificationIntent)
+                            } else {
+                                val intent = Intent()
+                                intent.action = NotificationService.STOP_SERVICE_ACTION
+                                this.sendBroadcast(intent)
+                            }
+                        }
+                    }else{
+                        val intent = Intent()
+                        intent.action = NotificationService.STOP_SERVICE_ACTION
+                        this.sendBroadcast(intent)
+                    }
+                }
+            }
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onRestart() {

@@ -10,7 +10,10 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
 import ca.sfu.BlueRadar.R
+import ca.sfu.BlueRadar.services.BluetoothService.Companion.deviceViewModel
+import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DevicesFragment
+import ca.sfu.BlueRadar.ui.devices.data.Device
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,6 +32,7 @@ class NotificationService: Service(){
     override fun onCreate() {
         super.onCreate()
         println("debug: onCreate called")
+
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         setupNotification()
 
@@ -38,23 +42,23 @@ class NotificationService: Service(){
         registerReceiver(myBroadcastReceiver, intentFilter)
 
         //Check if notification should be enabled or disabled
-        preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            when (key){
-                "preference_notifications" -> {
-                    val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-                    val checkBox = prefs.getBoolean("preference_notifications", true)
-                    if(checkBox){
-                        setupNotification()
-                    }else{
-                        notificationManager.cancel(notificationID)
-                        notificationManager.cancelAll()
-//                        unregisterReceiver(myBroadcastReceiver)
-                    }
-                }
-            }
-        }
-        preferences.registerOnSharedPreferenceChangeListener(listener)
+//        preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+//        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//            when (key){
+//                "preference_notifications" -> {
+//                    val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+//                    val checkBox = prefs.getBoolean("preference_notifications", true)
+//                    if(checkBox){
+//                        setupNotification()
+//                    }else{
+//                        notificationManager.cancel(notificationID)
+//                        notificationManager.cancelAll()
+////                        unregisterReceiver(myBroadcastReceiver)
+//                    }
+//                }
+//            }
+//        }
+//        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -113,16 +117,4 @@ class NotificationService: Service(){
         val now = Date()
         return SimpleDateFormat("ddHHmmss", Locale.US).format(now).toInt()
     }
-
-//    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-//        println("debug: sharedpreference change, boolean value")
-//        if(key == "preference_notifications"){
-//            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-//            val checkBox = prefs.getBoolean("preference_notifications", true)
-//            println("debug: sharedpreference change, boolean value ${checkBox}")
-//            if(!checkBox) {
-//                notificationManager.cancelAll()
-//            }
-//        }
-//    }
 }

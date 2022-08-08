@@ -3,6 +3,7 @@ package ca.sfu.BlueRadar.ui.devices
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,10 +12,12 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDevicesBinding
 import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.util.Util
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
@@ -36,6 +39,10 @@ class DevicesFragment : Fragment() {
     private lateinit var recyclerAdapter: DeviceRecyclerAdapter
     private lateinit var buttonGroup: ThemedToggleButtonGroup
 
+    private lateinit var notificationIntent: Intent
+    private lateinit var preferences: SharedPreferences
+    private var check: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bluetoothManager = getSystemService(requireContext(), BluetoothManager::class.java)!!
@@ -51,7 +58,45 @@ class DevicesFragment : Fragment() {
         requireActivity().registerReceiver(BluetoothService.receiver, Util.filter)
         deviceViewModel = BluetoothService.deviceViewModel
 
+
+//        var status: Boolean = false
+//
+//        preferences = PreferenceManager.getDefaultSharedPreferences(context!!)
+//        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//            when (key){
+//                "preference_notifications" -> {
+//                    val prefs = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
+//                    val checkBox = prefs?.getBoolean("preference_notifications", true)
+//                    if (checkBox != null) {
+//                        check = checkBox
+//                    }
+//                    if(checkBox == true && status){
+////                        notificationIntent = Intent(context, NotificationService::class.java)
+////                        context?.startService(notificationIntent)
+//                    }else{
+//                        val intent = Intent()
+//                        intent.action = NotificationService.STOP_SERVICE_ACTION
+//                        context?.sendBroadcast(intent)
+//                    }
+//                }
+//            }
+//        }
+//        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
+
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//        deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+//            if (!deviceViewModel.activeEntriesLiveData.value.isNullOrEmpty()) {
+//                notificationIntent = Intent(context, NotificationService::class.java)
+//                context?.startService(notificationIntent)
+//            } else {
+//                val intent = Intent()
+//                intent.action = NotificationService.STOP_SERVICE_ACTION
+//                context?.sendBroadcast(intent)
+//            }
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()
