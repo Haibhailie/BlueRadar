@@ -1,13 +1,17 @@
 package ca.sfu.BlueRadar.ui.devices
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.R
 import ca.sfu.BlueRadar.navigation.NavigationActivity
@@ -15,12 +19,14 @@ import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.data.Device
 import com.google.android.material.switchmaterial.SwitchMaterial
 
+
 class DeviceRecyclerAdapter(
     private val context: Context,
     private var deviceList: List<Device>,
     private var deviceViewModel: DeviceViewModel,
 ) :
-    RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>() {
+    RecyclerView.Adapter<DeviceRecyclerAdapter.ViewHolder>()
+    {
 
     private lateinit var notificationIntent: Intent
 
@@ -35,7 +41,8 @@ class DeviceRecyclerAdapter(
         val currItem = deviceList[position]
         //holder.imageView.setImageResource(ItemsViewModel.image)
         holder.deviceNameTextView.text = currItem.deviceName
-        notificationIntent = Intent(context, NotificationService::class.java)
+//        notificationIntent = Intent(context, NotificationService::class.java)
+
         if (currItem.deviceTracking) {
             holder.deviceIsTrackingTextView.text = "Tracking"
             holder.deviceIsTrackingTextView.setTextColor(Color.GREEN)
@@ -63,7 +70,7 @@ class DeviceRecyclerAdapter(
                 currItem.deviceTracking = true
                 deviceViewModel.update(currItem)
 
-                context.startService(notificationIntent)
+//                context.startService(notificationIntent)
             } else {
                 //Set the tracking to false here and update the database
                 holder.deviceIsTrackingTextView.text = "Not Tracking"
@@ -77,8 +84,8 @@ class DeviceRecyclerAdapter(
                 }
                 if (safeToClose) {
                     val intent = Intent()
-                    intent.action = NotificationService.STOP_SERVICE_ACTION
-                    context.sendBroadcast(intent)
+//                    intent.action = NotificationService.STOP_SERVICE_ACTION
+//                    context.sendBroadcast(intent)
 
                 }
 
@@ -121,4 +128,16 @@ class DeviceRecyclerAdapter(
         val syncButton: ImageButton = itemView.findViewById(R.id.syncButton)
     }
 
+//    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+//        if(key == "preference_notifications"){
+//            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+//            val checkBox = prefs.getBoolean("preference_notifications", true)
+//            println("debug: sharedpreference change, boolean value ${checkBox}")
+//            if(!checkBox) {
+//                val intent = Intent()
+//                intent.action = NotificationService.STOP_SERVICE_ACTION
+//                context.sendBroadcast(intent)
+//            }
+//        }
+//    }
 }

@@ -15,12 +15,6 @@
             app:iconSpaceReserved="false">
             <intent android:action=".ui.menu.SettingsAccountActivity" />
         </Preference>
-        <Preference
-            android:key="preference_date"
-            android:title="Adjust Time Settings"
-            android:summary="Update or sync time settings"
-            app:iconSpaceReserved="false">
-        </Preference>
 
     </PreferenceCategory>
 
@@ -28,11 +22,11 @@
         android:title="Additional Settings"
         app:iconSpaceReserved="false">
 
-        <Preference
+        <CheckBoxPreference
             android:key="preference_notifications"
-            android:title="Notification Settings"
+            android:title="Notifications"
             android:summary="Adjust notifications to be enabled or disabled"
-            android:defaultValue="1"
+            android:defaultValue="true"
             app:iconSpaceReserved="false"/>
         <Preference
             android:key="preference_data"

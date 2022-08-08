@@ -2,6 +2,8 @@ package ca.sfu.BlueRadar.ui.dashboard
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -13,10 +15,12 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.sfu.BlueRadar.databinding.FragmentDashboardBinding
 import ca.sfu.BlueRadar.services.BluetoothService
+import ca.sfu.BlueRadar.services.NotificationService
 import ca.sfu.BlueRadar.ui.devices.DeviceRecyclerAdapter
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModel
 import ca.sfu.BlueRadar.ui.devices.DeviceViewModelFactory
@@ -25,12 +29,16 @@ import ca.sfu.BlueRadar.ui.devices.data.Device
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabase
 import ca.sfu.BlueRadar.ui.devices.data.DeviceDatabaseDao
 import ca.sfu.BlueRadar.util.Util
+import com.mikepenz.iconics.Iconics.applicationContext
 
 class DashboardFragment : Fragment() {
     private lateinit var database: DeviceDatabase
     private lateinit var databaseDao: DeviceDatabaseDao
     private lateinit var viewModelFactory: DeviceViewModelFactory
     private lateinit var deviceViewModel: DeviceViewModel
+    private lateinit var preferences: SharedPreferences
+
+    private lateinit var notificationIntent: Intent
 
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -43,6 +51,8 @@ class DashboardFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private var check: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +89,51 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
+
+//        var status: Boolean = false
+//
+//        deviceViewModel.activeEntriesLiveData.observe(viewLifecycleOwner) {
+//            if (!deviceViewModel.activeEntriesLiveData.value.isNullOrEmpty()) {
+//                notificationIntent = Intent(context, NotificationService::class.java)
+//                context?.startService(notificationIntent)
+//            } else {
+//                val intent = Intent()
+//                intent.action = NotificationService.STOP_SERVICE_ACTION
+//                context?.sendBroadcast(intent)
+//            }
+//        }
+//
+//        preferences = PreferenceManager.getDefaultSharedPreferences(context!!)
+//        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//            when (key){
+//                "preference_notifications" -> {
+//                    val prefs = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
+//                    val checkBox = prefs?.getBoolean("preference_notifications", true)
+//                    if (checkBox != null) {
+//                        check = checkBox
+//                    }
+//                    if(checkBox == true && status){
+////                        notificationIntent = Intent(context, NotificationService::class.java)
+////                        context?.startService(notificationIntent)
+//                    }else{
+//                        val intent = Intent()
+//                        intent.action = NotificationService.STOP_SERVICE_ACTION
+//                        context?.sendBroadcast(intent)
+//                    }
+//                }
+//            }
+//        }
+//        preferences.registerOnSharedPreferenceChangeListener(listener)
+
+//        if(check && status){
+//            notificationIntent = Intent(context, NotificationService::class.java)
+//            context?.startService(notificationIntent)
+//        }else{
+//            val intent = Intent()
+//            intent.action = NotificationService.STOP_SERVICE_ACTION
+//            context?.sendBroadcast(intent)
+//        }
+
         return root
     }
 
