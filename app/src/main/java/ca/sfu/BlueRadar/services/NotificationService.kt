@@ -5,10 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
@@ -17,12 +14,13 @@ import ca.sfu.BlueRadar.ui.devices.DevicesFragment
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotificationService: Service() {
+class NotificationService: Service(){
 
     private var notificationID = 1
     private var channelID = "notification channel"
     private lateinit var myBroadcastReceiver: MyBroadcastReceiver
     private lateinit var notificationManager: NotificationManager
+    private lateinit var preferences: SharedPreferences
 
     companion object {
         val STOP_SERVICE_ACTION = "stop service action"
@@ -38,6 +36,25 @@ class NotificationService: Service() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(STOP_SERVICE_ACTION)
         registerReceiver(myBroadcastReceiver, intentFilter)
+
+        //Check if notification should be enabled or disabled
+        preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            when (key){
+                "preference_notifications" -> {
+                    val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+                    val checkBox = prefs.getBoolean("preference_notifications", true)
+                    if(checkBox){
+                        setupNotification()
+                    }else{
+                        notificationManager.cancel(notificationID)
+                        notificationManager.cancelAll()
+//                        unregisterReceiver(myBroadcastReceiver)
+                    }
+                }
+            }
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -87,6 +104,7 @@ class NotificationService: Service() {
         override fun onReceive(context: Context, intent: Intent) {
             stopSelf()
             notificationManager.cancel(notificationID)
+            notificationManager.cancelAll()
             unregisterReceiver(myBroadcastReceiver)
         }
     }
@@ -95,4 +113,16 @@ class NotificationService: Service() {
         val now = Date()
         return SimpleDateFormat("ddHHmmss", Locale.US).format(now).toInt()
     }
+
+//    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+//        println("debug: sharedpreference change, boolean value")
+//        if(key == "preference_notifications"){
+//            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+//            val checkBox = prefs.getBoolean("preference_notifications", true)
+//            println("debug: sharedpreference change, boolean value ${checkBox}")
+//            if(!checkBox) {
+//                notificationManager.cancelAll()
+//            }
+//        }
+//    }
 }

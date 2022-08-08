@@ -40,7 +40,6 @@ class BluetoothService() : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        println("debug: onCreate called")
         receiver = receiverSkeleton
         bluetoothManager = ContextCompat.getSystemService(
             this,
@@ -78,14 +77,12 @@ class BluetoothService() : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        println("debug: onStartCommand called")
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
         stopSelf()
-        println("debug: onDestroy called")
     }
 
     override fun onBind(p0: Intent?): IBinder? {
